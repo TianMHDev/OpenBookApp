@@ -1,0 +1,456 @@
+{
+	"info": {
+		"_postman_id": "openbook-api-collection",
+		"name": "OpenBook API",
+		"description": "Complete API collection for OpenBook digital library platform. Includes authentication, book management, user operations, and teacher functions.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "openbook-api"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "User Registration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"full_name\": \"John Doe\",\n  \"email\": \"john.doe@estudiante.edu.co\",\n  \"password\": \"Password123\",\n  \"institution_name\": \"Universidad Nacional\",\n  \"role\": \"student\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Register a new user (student or teacher). Email domain determines role: @estudiante.edu.co for students, @maestro.edu.co for teachers."
+					},
+					"response": []
+				},
+				{
+					"name": "User Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.success && response.data && response.data.token) {",
+									"        pm.environment.set('token', response.data.token);",
+									"        console.log('Token saved:', response.data.token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"carlos.ruiz@estudiante.edu.co\",\n  \"password\": \"Password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login with email and password. Returns JWT token for authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Token",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/verify",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"verify"
+							]
+						},
+						"description": "Verify if the current JWT token is valid and get user information."
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for user registration, login, and token verification."
+		},
+		{
+			"name": "Books",
+			"item": [
+				{
+					"name": "Get All Books",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/books?search=harry&limit=10&offset=0&sort=title-asc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"books"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "harry",
+									"description": "Search term for title or author"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Number of books to return"
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Number of books to skip (for pagination)"
+								},
+								{
+									"key": "sort",
+									"value": "title-asc",
+									"description": "Sort order (field-direction)"
+								}
+							]
+						},
+						"description": "Get all books with optional search, pagination, and sorting. Available sort fields: title, author, publication_year, created_at. Directions: asc, desc."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Book Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/books/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"books",
+								"1"
+							]
+						},
+						"description": "Get detailed information about a specific book by ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Book Content",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/books/1/content",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"books",
+								"1",
+								"content"
+							]
+						},
+						"description": "Get book content for reading. Only accessible if the user has been assigned this book."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Book Genres",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/books/genres",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"books",
+								"genres"
+							]
+						},
+						"description": "Get all available book genres for filtering."
+					},
+					"response": []
+				}
+			],
+			"description": "Book management endpoints for browsing, searching, and accessing book content."
+		},
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "Get User Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/users/dashboard",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"dashboard"
+							]
+						},
+						"description": "Get user dashboard data including statistics and recent activity."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Assignments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/users/assignments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"assignments"
+							]
+						},
+						"description": "Get all book assignments for the current user (student)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Assignment Progress",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"progress\": 75\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/assignments/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"assignments",
+								"1"
+							]
+						},
+						"description": "Update reading progress for a specific book assignment. Progress should be 0-100."
+					},
+					"response": []
+				}
+			],
+			"description": "User management endpoints for dashboard data and assignment progress."
+		},
+		{
+			"name": "Teacher Functions",
+			"item": [
+				{
+					"name": "Assign Book to Student",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"studentEmail\": \"carlos.ruiz@estudiante.edu.co\",\n  \"bookId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/teacher/assign",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"teacher",
+								"assign"
+							]
+						},
+						"description": "Assign a book to a student. Only teachers can perform this action."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Teacher's Students",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/teacher/students",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"teacher",
+								"students"
+							]
+						},
+						"description": "Get all students assigned to the current teacher."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Teacher's Assignments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/teacher/assignments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"teacher",
+								"assignments"
+							]
+						},
+						"description": "Get all book assignments created by the current teacher."
+					},
+					"response": []
+				}
+			],
+			"description": "Teacher-specific endpoints for managing students and assignments."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
