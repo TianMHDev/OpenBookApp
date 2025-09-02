@@ -224,6 +224,12 @@ function validateFormDataClient(formData) {
     if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
         errors.email = 'Formato de correo inválido';
         isValid = false;
+    } else {
+        // Check domain based on selected role
+        if (formData.role && !validateEmailFormatUX(formData.email, formData.role)) {
+            errors.email = `El correo debe terminar en ${ROLE_CONFIG[formData.role].domain}`;
+            isValid = false;
+        }
     }
 
     // Validate role-specific email domain
@@ -244,6 +250,12 @@ function validateFormDataClient(formData) {
         isValid = false;
     }
 
+    // Validate institution selection
+    if (!formData.institutionId || formData.institutionId === '') {
+        errors.institutionId = 'Debes seleccionar una institución';
+        isValid = false;
+    }
+
     return { isValid, errors };
 }
 
@@ -252,14 +264,28 @@ function validateFormDataClient(formData) {
  * @returns {Object} - Form data object
  */
 function collectFormData() {
+    // Get user type from radio buttons
+    const userTypeRadios = document.querySelectorAll('input[name="userType"]');
+    let selectedRole = '';
+    userTypeRadios.forEach(radio => {
+        if (radio.checked) {
+            selectedRole = radio.value;
+        }
+    });
+
+    // Get institution data
+    const institutionSelect = document.getElementById('institution');
+    const institutionId = institutionSelect?.value || '';
+    const institutionName = institutionSelect?.options[institutionSelect?.selectedIndex]?.text || '';
+
     return {
-        fullName: document.getElementById('register-fullName')?.value?.trim() || '',
-        nationalId: document.getElementById('register-nationalId')?.value?.trim() || '',
-        email: document.getElementById('register-email')?.value?.trim() || '',
-        password: document.getElementById('register-password')?.value || '',
-        role: document.getElementById('register-role')?.value || '',
-        institutionId: document.getElementById('register-institutionId')?.value || '',
-        institutionName: document.getElementById('register-institutionName')?.value?.trim() || ''
+        fullName: document.getElementById('fullName')?.value?.trim() || '',
+        nationalId: document.getElementById('nationalId')?.value?.trim() || '',
+        email: document.getElementById('email')?.value?.trim() || '',
+        password: document.getElementById('password')?.value || '',
+        role: selectedRole,
+        institutionId: institutionId,
+        institutionName: institutionName
     };
 }
 
@@ -270,7 +296,21 @@ function collectFormData() {
 function showValidationErrors(errors) {
     // Clear previous errors
     Object.keys(errors).forEach(field => {
-        const errorElement = document.getElementById(`${field}-error`);
+        let errorElement;
+        if (field === 'fullName') {
+            errorElement = document.getElementById('fullName-error');
+        } else if (field === 'nationalId') {
+            errorElement = document.getElementById('ID-error');
+        } else if (field === 'email') {
+            errorElement = document.getElementById('email-error');
+        } else if (field === 'password') {
+            errorElement = document.getElementById('password-error');
+        } else if (field === 'role') {
+            errorElement = document.getElementById('register-usertype-error');
+        } else if (field === 'institutionId') {
+            errorElement = document.getElementById('institution-error');
+        }
+        
         if (errorElement) {
             errorElement.textContent = '';
             errorElement.style.display = 'none';
@@ -279,7 +319,21 @@ function showValidationErrors(errors) {
 
     // Show new errors
     Object.entries(errors).forEach(([field, message]) => {
-        const errorElement = document.getElementById(`${field}-error`);
+        let errorElement;
+        if (field === 'fullName') {
+            errorElement = document.getElementById('fullName-error');
+        } else if (field === 'nationalId') {
+            errorElement = document.getElementById('ID-error');
+        } else if (field === 'email') {
+            errorElement = document.getElementById('email-error');
+        } else if (field === 'password') {
+            errorElement = document.getElementById('password-error');
+        } else if (field === 'role') {
+            errorElement = document.getElementById('register-usertype-error');
+        } else if (field === 'institutionId') {
+            errorElement = document.getElementById('institution-error');
+        }
+        
         if (errorElement) {
             errorElement.textContent = message;
             errorElement.style.display = 'block';
@@ -534,5 +588,153 @@ document.addEventListener('DOMContentLoaded', function() {
     const registerForm = document.getElementById('register-form');
     if (registerForm) {
         registerForm.addEventListener('submit', handleRegister);
+        
+        // Add real-time validation for registration form
+        setupRealTimeValidation();
     }
 });
+
+/**
+ * Sets up real-time validation for registration form fields
+ */
+function setupRealTimeValidation() {
+    // Full name validation
+    const fullNameInput = document.getElementById('fullName');
+    if (fullNameInput) {
+        fullNameInput.addEventListener('blur', () => {
+            validateField('fullName', fullNameInput.value.trim());
+        });
+        fullNameInput.addEventListener('input', () => {
+            clearFieldError(document.getElementById('fullName-error'));
+        });
+    }
+
+    // National ID validation
+    const nationalIdInput = document.getElementById('nationalId');
+    if (nationalIdInput) {
+        nationalIdInput.addEventListener('blur', () => {
+            validateField('nationalId', nationalIdInput.value.trim());
+        });
+        nationalIdInput.addEventListener('input', () => {
+            clearFieldError(document.getElementById('ID-error'));
+        });
+    }
+
+    // Email validation
+    const emailInput = document.getElementById('email');
+    if (emailInput) {
+        emailInput.addEventListener('blur', () => {
+            validateField('email', emailInput.value.trim());
+        });
+        emailInput.addEventListener('input', () => {
+            clearFieldError(document.getElementById('email-error'));
+        });
+    }
+
+    // Password validation
+    const passwordInput = document.getElementById('password');
+    if (passwordInput) {
+        passwordInput.addEventListener('blur', () => {
+            validateField('password', passwordInput.value);
+        });
+        passwordInput.addEventListener('input', () => {
+            clearFieldError(document.getElementById('password-error'));
+        });
+    }
+
+    // User type validation
+    const userTypeRadios = document.querySelectorAll('input[name="userType"]');
+    userTypeRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            clearFieldError(document.getElementById('register-usertype-error'));
+        });
+    });
+
+    // Institution validation
+    const institutionSelect = document.getElementById('institution');
+    if (institutionSelect) {
+        institutionSelect.addEventListener('change', () => {
+            clearFieldError(document.getElementById('institution-error'));
+        });
+    }
+}
+
+/**
+ * Validates a single field and shows error if invalid
+ */
+function validateField(fieldName, value) {
+    const errorElement = getErrorElement(fieldName);
+    if (!errorElement) return;
+
+    let isValid = true;
+    let errorMessage = '';
+
+    switch (fieldName) {
+        case 'fullName':
+            if (!value || value.length < 3) {
+                isValid = false;
+                errorMessage = 'El nombre debe tener al menos 3 caracteres';
+            }
+            break;
+        case 'nationalId':
+            if (!value || !/^\d{7,12}$/.test(value)) {
+                isValid = false;
+                errorMessage = 'Número de identificación inválido (7-12 dígitos)';
+            }
+            break;
+        case 'email':
+            if (!value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                isValid = false;
+                errorMessage = 'Formato de correo inválido';
+            } else {
+                // Check domain based on selected role
+                const userTypeRadios = document.querySelectorAll('input[name="userType"]');
+                let selectedRole = '';
+                userTypeRadios.forEach(radio => {
+                    if (radio.checked) {
+                        selectedRole = radio.value;
+                    }
+                });
+                
+                if (selectedRole && !validateEmailFormatUX(value, selectedRole)) {
+                    isValid = false;
+                    errorMessage = `El correo debe terminar en ${ROLE_CONFIG[selectedRole].domain}`;
+                }
+            }
+            break;
+        case 'password':
+            if (!value || value.length < 8) {
+                isValid = false;
+                errorMessage = 'La contraseña debe tener al menos 8 caracteres';
+            }
+            break;
+    }
+
+    if (!isValid) {
+        errorElement.textContent = errorMessage;
+        errorElement.style.display = 'block';
+        errorElement.style.color = '#dc3545';
+    }
+}
+
+/**
+ * Gets the error element for a given field
+ */
+function getErrorElement(fieldName) {
+    switch (fieldName) {
+        case 'fullName':
+            return document.getElementById('fullName-error');
+        case 'nationalId':
+            return document.getElementById('ID-error');
+        case 'email':
+            return document.getElementById('email-error');
+        case 'password':
+            return document.getElementById('password-error');
+        case 'role':
+            return document.getElementById('register-usertype-error');
+        case 'institutionId':
+            return document.getElementById('institution-error');
+        default:
+            return null;
+    }
+}
