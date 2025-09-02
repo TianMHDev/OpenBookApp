@@ -1,13 +1,9 @@
 import mysql from 'mysql2/promise';
-import dotenv from 'dotenv';
 import { dbConfig } from '../config/vercel.js';
-
-dotenv.config(); // Loading Environment Variables from the .env File
 
 // Creating a MySQL Database Connection Pool
 // Using Environment Variables for Configuration
-// Make sure the environment variables are defined in your .env file
-// and that the .env file is in the project root.
+// In Vercel, environment variables are available directly via process.env
 
 export const pool = mysql.createPool(dbConfig);
 
@@ -44,5 +40,7 @@ export const initializeDatabase = async (maxRetries = 3) => {
   return false;
 };
 
-// Initialize connection on module load
-checkConnection();
+// Initialize connection on module load (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  checkConnection();
+}

@@ -9,7 +9,7 @@ export const dbConfig = {
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'openbook',
-  port: process.env.DB_PORT || 3306,
+  port: parseInt(process.env.DB_PORT) || 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -35,11 +35,24 @@ export const corsConfig = {
 
 // Server configuration
 export const serverConfig = {
-  port: process.env.PORT || 3000,
+  port: parseInt(process.env.PORT) || 3000,
   nodeEnv: process.env.NODE_ENV || 'development'
 };
 
 // External API configuration
 export const apiConfig = {
   openLibraryUrl: process.env.OPENLIBRARY_API_URL || 'https://openlibrary.org/api'
+};
+
+// Debug function to log environment variables (without sensitive data)
+export const debugEnv = () => {
+  console.log('🔧 Environment Configuration:');
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('PORT:', process.env.PORT);
+  console.log('DB_HOST:', process.env.DB_HOST ? '✅ set' : '❌ not set');
+  console.log('DB_USER:', process.env.DB_USER ? '✅ set' : '❌ not set');
+  console.log('DB_PASSWORD:', process.env.DB_PASSWORD ? '✅ set' : '❌ not set');
+  console.log('DB_NAME:', process.env.DB_NAME ? '✅ set' : '❌ not set');
+  console.log('DB_PORT:', process.env.DB_PORT);
+  console.log('JWT_SECRET:', process.env.JWT_SECRET ? '✅ set' : '❌ not set');
 };

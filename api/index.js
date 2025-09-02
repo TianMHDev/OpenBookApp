@@ -5,7 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { pool, initializeDatabase } from '../backend/database/conexion_db.js';
 import { sincronizarTodosLosGeneros } from '../backend/api/sync_openlibrary.js';
-import { corsConfig, serverConfig } from '../backend/config/vercel.js';
+import { corsConfig, serverConfig, debugEnv } from '../backend/config/vercel.js';
 
 // Import organized routes
 import apiRoutes from '../backend/routes/index.js';
@@ -104,33 +104,62 @@ let dbInitialized = false;
 const initializeApp = async () => {
     if (!dbInitialized) {
         try {
+            console.log("🚀 Starting OpenBook Backend...");
+            console.log(`🌍 Environment: ${serverConfig.nodeEnv}`);
+            
+            // Debug environment variables
+            debugEnv();
+            
             console.log("🔄 Initializing database connection...");
             await initializeDatabase();
             dbInitialized = true;
             console.log("✅ Database initialized successfully");
+            
+            // Check if database is empty and sync if needed
+            try {
+                const [rows] = await pool.query("SELECT COUNT(*) as count FROM books");
+                if (rows[0].count === 0) {
+                    console.log("📚 Database is empty. Starting synchronization...");
+                    await sincronizarTodosLosGeneros();
+                } else {
+                    console.log("✅ Database already has books. No synchronization needed.");
+                }
+            } catch (error) {
+                console.error("❌ Error checking database:", error.message);
+            }
+            
         } catch (error) {
             console.error("❌ Database initialization failed:", error.message);
+            // Don't throw error, continue without database
         }
     }
 };
 
 // Export for Vercel serverless
 export default async function handler(req, res) {
-    await initializeApp();
-    
-    // Handle the request with Express
-    return new Promise((resolve, reject) => {
-        app(req, res, (err) => {
-            if (err) {
-                console.error("❌ Express error:", err);
-                res.status(500).json({
-                    success: false,
-                    message: "Error interno del servidor"
-                });
-                resolve();
-            } else {
-                resolve();
-            }
+    try {
+        await initializeApp();
+        
+        // Handle the request with Express
+        return new Promise((resolve, reject) => {
+            app(req, res, (err) => {
+                if (err) {
+                    console.error("❌ Express error:", err);
+                    res.status(500).json({
+                        success: false,
+                        message: "Error interno del servidor"
+                    });
+                    resolve();
+                } else {
+                    resolve();
+                }
+            });
         });
-    });
+    } catch (error) {
+        console.error("❌ Handler error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error interno del servidor"
+        });
+    }
 }
