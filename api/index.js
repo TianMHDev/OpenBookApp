@@ -297,9 +297,6 @@ app.post('/api/init-db', async (req, res) => {
   }
 });
 
-// Mount all API routes under /api
-app.use('/api', apiRoutes);
-
 // Environment info endpoint
 app.get('/api/env-info', async (req, res) => {
   try {
@@ -341,6 +338,9 @@ app.get('/api/env-info', async (req, res) => {
     });
   }
 });
+
+// Mount all API routes under /api
+app.use('/api', apiRoutes);
 
 // Catch-all for API routes
 app.use('/api/*', (req, res) => {
