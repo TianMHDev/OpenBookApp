@@ -111,32 +111,35 @@ app.get('/api/test-db', async (req, res) => {
       });
     }
 
-    // Test database query
-    const [rows] = await pool.query("SELECT COUNT(*) as count FROM books");
-    
-    res.json({
-      success: true,
-      message: 'Database connection successful',
-      timestamp: new Date().toISOString(),
-      data: {
-        bookCount: rows[0].count,
-        connectionStatus: 'active'
-      },
-      env: {
-        hasDbHost: !!process.env.DB_HOST,
-        hasDbUser: !!process.env.DB_USER,
-        hasDbPassword: !!process.env.DB_PASSWORD,
-        hasDbName: !!process.env.DB_NAME,
-        hasDbPort: !!process.env.DB_PORT
-      }
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Database test failed',
-      error: error.message,
-      env: {
-        hasDbHost: !!process.env.DB_HOST,
+    // Test database query with better error handling
+    try {
+      const [rows] = await pool.query("SELECT COUNT(*) as count FROM books");
+      
+      res.json({
+        success: true,
+        message: 'Database connection successful',
+        timestamp: new Date().toISOString(),
+        data: {
+          bookCount: rows[0].count,
+          connectionStatus: 'active'
+        },
+        env: {
+          hasDbHost: !!process.env.DB_HOST,
+          hasDbUser: !!process.env.DB_USER,
+          hasDbPassword: !!process.env.DB_PASSWORD,
+          hasDbName: !!process.env.DB_NAME,
+          hasDbPort: !!process.env.DB_PORT,
+          dbHost: process.env.DB_HOST,
+          dbPort: process.env.DB_PORT
+        }
+      });
+    } catch (dbError) {
+      res.status(500).json({
+        success: false,
+        message: 'Database query failed',
+        error: dbError.message,
+        env: {
+          hasDbHost: !!process.env.DB_HOST,
         hasDbUser: !!process.env.DB_USER,
         hasDbPassword: !!process.env.DB_PASSWORD,
         hasDbName: !!process.env.DB_NAME,

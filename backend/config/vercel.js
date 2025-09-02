@@ -16,7 +16,11 @@ export const dbConfig = {
   // Add SSL configuration for production databases
   ssl: process.env.NODE_ENV === 'production' ? {
     rejectUnauthorized: false
-  } : false
+  } : false,
+  // Add connection timeout and retry settings
+  acquireTimeout: 60000,
+  timeout: 60000,
+  reconnect: true
 };
 
 // JWT configuration
