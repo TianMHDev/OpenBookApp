@@ -127,6 +127,70 @@ app.get('/api/env-info', (req, res) => {
   });
 });
 
+// Database initialization endpoint
+app.get('/api/init-db', async (req, res) => {
+  try {
+    await initializeApp();
+    
+    if (!dbInitialized) {
+      return res.status(500).json({
+        success: false,
+        message: 'Database connection failed',
+        error: 'Cannot initialize database without connection'
+      });
+    }
+
+    // Read and execute the database setup script
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const { fileURLToPath } = await import('url');
+    
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const setupScriptPath = path.join(__dirname, '..', 'database-setup.sql');
+    
+    const setupScript = await fs.readFile(setupScriptPath, 'utf8');
+    
+    // Split the script into individual statements
+    const statements = setupScript
+      .split(';')
+      .map(stmt => stmt.trim())
+      .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'));
+    
+    const results = [];
+    
+    for (const statement of statements) {
+      try {
+        if (statement.toLowerCase().includes('create table') || 
+            statement.toLowerCase().includes('insert into')) {
+          await pool.query(statement);
+          results.push({ statement: statement.substring(0, 50) + '...', status: 'success' });
+        }
+      } catch (error) {
+        results.push({ statement: statement.substring(0, 50) + '...', status: 'error', error: error.message });
+      }
+    }
+    
+    res.json({
+      success: true,
+      message: 'Database initialization completed',
+      timestamp: new Date().toISOString(),
+      results: results,
+      summary: {
+        totalStatements: statements.length,
+        successful: results.filter(r => r.status === 'success').length,
+        errors: results.filter(r => r.status === 'error').length
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Database initialization failed',
+      error: error.message
+    });
+  }
+});
+
 // Catch-all for API routes
 app.use('/api/*', (req, res) => {
   res.status(404).json({
