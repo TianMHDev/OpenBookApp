@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://localhost:3000/api/auth';
+// Use configuration from config.js
+const API_BASE_URL = window.APP_CONFIG ? `${window.APP_CONFIG.apiBaseUrl}/auth` : 'http://localhost:3000/api/auth';
 console.log("🔗 API_BASE_URL configurado:", API_BASE_URL);
 console.log("📁 Archivo auth.js cargado correctamente");
 
