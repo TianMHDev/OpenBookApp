@@ -4,7 +4,7 @@
 
 class ApiService {
     constructor() {
-        this.baseURL = 'http://localhost:3000/api';
+        this.baseURL = window.APP_CONFIG ? window.APP_CONFIG.apiBaseUrl : 'http://localhost:3000/api';
         this.token = localStorage.getItem('token');
     }
 

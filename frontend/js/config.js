@@ -8,7 +8,7 @@ const config = {
     
     // Production environment (your deployed backend)
     production: {
-        apiBaseUrl: 'https://your-backend-domain.com/api', // TODO: Cambia esto por la URL real de tu backend desplegado
+        apiBaseUrl: 'https://open-book-backend-43ekeznn8-jadensmithahr-8971s-projects.vercel.app/api', // Backend actualizado con CORS
         environment: 'production'
     }
 };

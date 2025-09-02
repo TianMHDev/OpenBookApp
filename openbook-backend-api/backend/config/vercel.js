@@ -5,16 +5,12 @@
 
 // Database configuration for Vercel
 export const dbConfig = {
-  // Support both Railway and Clever Cloud
-  host: process.env.NODE_ENV === 'production' 
-    ? (process.env.CLEVER_CLOUD_HOST || 'crossover.proxy.rlwy.net') 
-    : (process.env.DB_HOST || process.env.MYSQLHOST || 'localhost'),
-  user: process.env.DB_USER || process.env.MYSQLUSER || process.env.CLEVER_CLOUD_USER || 'root',
-  password: process.env.DB_PASSWORD || process.env.MYSQLPASSWORD || process.env.CLEVER_CLOUD_PASSWORD || 'LfoGYuVpGdzjmiyfIieZBDZJbbBPgWwf',
-  database: process.env.DB_NAME || process.env.MYSQLDATABASE || process.env.CLEVER_CLOUD_DATABASE || 'railway',
-  port: process.env.NODE_ENV === 'production' 
-    ? (parseInt(process.env.CLEVER_CLOUD_PORT) || 14400) 
-    : (parseInt(process.env.DB_PORT || process.env.MYSQLPORT) || 3306),
+  // Force use of Railway external URL for production
+  host: process.env.NODE_ENV === 'production' ? 'crossover.proxy.rlwy.net' : (process.env.DB_HOST || process.env.MYSQLHOST || 'localhost'),
+  user: process.env.DB_USER || process.env.MYSQLUSER || 'root',
+  password: process.env.DB_PASSWORD || process.env.MYSQLPASSWORD || 'LfoGYuVpGdzjmiyfIieZBDZJbbBPgWwf',
+  database: process.env.DB_NAME || process.env.MYSQLDATABASE || 'railway',
+  port: process.env.NODE_ENV === 'production' ? 14400 : (parseInt(process.env.DB_PORT || process.env.MYSQLPORT) || 3306),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -58,17 +54,10 @@ export const debugEnv = () => {
   console.log('🔧 Environment Configuration:');
   console.log('NODE_ENV:', process.env.NODE_ENV);
   console.log('PORT:', process.env.PORT);
-  console.log('--- Railway Variables ---');
   console.log('DB_HOST:', process.env.DB_HOST ? '✅ set' : '❌ not set');
   console.log('DB_USER:', process.env.DB_USER ? '✅ set' : '❌ not set');
   console.log('DB_PASSWORD:', process.env.DB_PASSWORD ? '✅ set' : '❌ not set');
   console.log('DB_NAME:', process.env.DB_NAME ? '✅ set' : '❌ not set');
   console.log('DB_PORT:', process.env.DB_PORT);
-  console.log('--- Clever Cloud Variables ---');
-  console.log('CLEVER_CLOUD_HOST:', process.env.CLEVER_CLOUD_HOST ? '✅ set' : '❌ not set');
-  console.log('CLEVER_CLOUD_USER:', process.env.CLEVER_CLOUD_USER ? '✅ set' : '❌ not set');
-  console.log('CLEVER_CLOUD_PASSWORD:', process.env.CLEVER_CLOUD_PASSWORD ? '✅ set' : '❌ not set');
-  console.log('CLEVER_CLOUD_DATABASE:', process.env.CLEVER_CLOUD_DATABASE ? '✅ set' : '❌ not set');
-  console.log('CLEVER_CLOUD_PORT:', process.env.CLEVER_CLOUD_PORT);
   console.log('JWT_SECRET:', process.env.JWT_SECRET ? '✅ set' : '❌ not set');
 };

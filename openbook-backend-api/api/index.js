@@ -8,55 +8,27 @@ import apiRoutes from '../backend/routes/index.js';
 
 const app = express();
 
-// CORS configuration for Vercel serverless
+// CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    // Allow all Vercel frontend domains and local development
-    const allowedOrigins = [
-      'https://frontend-5qdr0np9b-jadensmithahr-8971s-projects.vercel.app',
-      'https://frontend-eq79nhikj-jadensmithahr-8971s-projects.vercel.app',
-      'https://openbook-frontend.vercel.app',
-      'http://localhost:3000',
-      'http://localhost:5000',
-      'http://127.0.0.1:3000',
-      'http://127.0.0.1:5000'
-    ];
-    
-    // Check if origin is in allowed list or contains vercel.app
-    if (allowedOrigins.includes(origin) || origin.includes('vercel.app')) {
+    // Allow all Vercel frontend domains
+    if (origin.includes('vercel.app') || 
+        origin.includes('localhost') || 
+        origin.includes('127.0.0.1')) {
       return callback(null, true);
     }
     
-    console.log('CORS blocked origin:', origin);
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept'],
-  preflightContinue: false,
-  optionsSuccessStatus: 204
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 
 app.use(cors(corsOptions));
-
-// Additional CORS headers for preflight requests
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Origin, Accept');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    res.status(204).end();
-    return;
-  }
-  
-  next();
-});
 app.use(express.json());
 
 // Initialize database connection
@@ -89,11 +61,6 @@ app.get('/api/health', async (req, res) => {
       database: {
         initialized: dbInitialized,
         status: dbInitialized ? 'connected' : 'failed'
-      },
-      cors: {
-        origin: req.headers.origin,
-        method: req.method,
-        headers: req.headers
       }
     });
   } catch (error) {
@@ -103,24 +70,6 @@ app.get('/api/health', async (req, res) => {
       error: error.message
     });
   }
-});
-
-// CORS test endpoint
-app.options('/api/cors-test', (req, res) => {
-  res.status(204).end();
-});
-
-app.get('/api/cors-test', (req, res) => {
-  res.json({
-    success: true,
-    message: 'CORS is working!',
-    timestamp: new Date().toISOString(),
-    request: {
-      origin: req.headers.origin,
-      method: req.method,
-      headers: req.headers
-    }
-  });
 });
 
 // Database test endpoint

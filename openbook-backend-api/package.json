@@ -1,0 +1,32 @@
+{
+  "name": "openbook-backend",
+  "version": "1.0.0",
+  "description": "Backend de OpenBook - Plataforma de biblioteca digital",
+  "main": "backend/app/index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node backend/app/index.js",
+    "dev": "node backend/app/index.js",
+    "build": "npm install",
+    "vercel-build": "npm install",
+    "test-config": "node test-vercel.js"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "axios-retry": "^4.5.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.3",
+    "node-fetch": "^3.3.2",
+    "path": "^0.12.7"
+  },
+  "keywords": ["openbook", "library", "education", "api"],
+  "author": "OpenBook Development Team",
+  "license": "ISC"
+}
