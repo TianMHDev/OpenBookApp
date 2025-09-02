@@ -102,3 +102,4 @@ Para soporte técnico, contacta al equipo de desarrollo.
 
 **OpenBookApp** - Transformando la educación digital 📚
 # Trigger Vercel Deployment
+# Force Vercel Deployment - lun 01 sep 2025 22:58:36 -05
