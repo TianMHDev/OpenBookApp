@@ -19,18 +19,19 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
-import { pool } from "../database/conexion_db.js";
+import { pool, initializeDatabase } from "../database/conexion_db.js";
 import { sincronizarTodosLosGeneros } from "../api/sync_openlibrary.js";
+import { corsConfig, serverConfig } from "../config/vercel.js";
 
 // Import organized routes
 import apiRoutes from "../routes/index.js";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = serverConfig.port;
 
 const __filename = fileURLToPath(import.meta.url);
 
-app.use(cors());
+app.use(cors(corsConfig));
 app.use(express.json());
 
 // Configure static files - MUST come before routes
@@ -139,21 +140,29 @@ app.use((error, req, res, next) => {
 // Start the server and synchronization
 app.listen(PORT, async () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🌍 Environment: ${serverConfig.nodeEnv}`);
     console.log(`📁 Serving static files from: frontend/`);
     console.log(`🔐 Protected routes configured by roles`);
     console.log(`📚 API endpoints available at: /api/*`);
     
-    // Check if the database is empty before synchronizing
-    try {
-        const [rows] = await pool.query("SELECT COUNT(*) as count FROM books");
-        if (rows[0].count === 0) {
-            console.log("📚 Database is empty. Starting synchronization...");
-            await sincronizarTodosLosGeneros();
-        } else {
-            console.log("✅ Database already has books. No synchronization needed.");
+    // Initialize database connection
+    const dbConnected = await initializeDatabase();
+    
+    if (dbConnected) {
+        // Check if the database is empty before synchronizing
+        try {
+            const [rows] = await pool.query("SELECT COUNT(*) as count FROM books");
+            if (rows[0].count === 0) {
+                console.log("📚 Database is empty. Starting synchronization...");
+                await sincronizarTodosLosGeneros();
+            } else {
+                console.log("✅ Database already has books. No synchronization needed.");
+            }
+        } catch (error) {
+            console.error("❌ Error checking database:", error.message);
         }
-    } catch (error) {
-        console.error("❌ Error checking database:", error.message);
+    } else {
+        console.error("❌ Database connection failed. Some features may not work properly.");
     }
 });
 
