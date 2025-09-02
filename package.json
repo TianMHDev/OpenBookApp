@@ -4,11 +4,14 @@
   "description": "Backend de OpenBook - Plataforma de biblioteca digital",
   "main": "backend/app/index.js",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node backend/app/index.js",
     "dev": "node backend/app/index.js",
-    "build": "echo 'Build completed'",
-    "vercel-build": "echo 'Vercel build completed'",
+    "build": "npm install",
+    "vercel-build": "npm install",
     "test-config": "node test-vercel.js"
   },
   "dependencies": {
