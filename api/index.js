@@ -87,7 +87,7 @@ app.get('/api/test-db', async (req, res) => {
     }
 
     // Import dbConfig to show actual configuration
-    const { dbConfig } = await import('../backend/config/vercel.js');
+    const { dbConfig } = await import('../backend/config/vercel.js').catch(() => ({ dbConfig: { host: 'error', port: 'error', database: 'error', user: 'error' } }));
     
     // Test database query with better error handling
     try {
