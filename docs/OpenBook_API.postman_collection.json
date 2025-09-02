@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "openbook-api-collection",
-		"name": "OpenBook API",
-		"description": "Complete API collection for OpenBook digital library platform. Includes authentication, book management, user operations, and teacher functions.",
+		"name": "OpenBook API Collection",
+		"description": "Complete API collection for OpenBook digital learning platform",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "openbook-api"
 	},
@@ -11,7 +11,7 @@
 			"name": "Authentication",
 			"item": [
 				{
-					"name": "User Registration",
+					"name": "Login",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -22,53 +22,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"full_name\": \"John Doe\",\n  \"email\": \"john.doe@estudiante.edu.co\",\n  \"password\": \"Password123\",\n  \"institution_name\": \"Universidad Nacional\",\n  \"role\": \"student\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/auth/register",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"auth",
-								"register"
-							]
-						},
-						"description": "Register a new user (student or teacher). Email domain determines role: @estudiante.edu.co for students, @maestro.edu.co for teachers."
-					},
-					"response": []
-				},
-				{
-					"name": "User Login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    const response = pm.response.json();",
-									"    if (response.success && response.data && response.data.token) {",
-									"        pm.environment.set('token', response.data.token);",
-									"        console.log('Token saved:', response.data.token);",
-									"    }",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"email\": \"carlos.ruiz@estudiante.edu.co\",\n  \"password\": \"Password123\"\n}"
+							"raw": "{\n    \"email\": \"carlos.ruiz@estudiante.edu.co\",\n    \"password\": \"password123\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/auth/login",
@@ -81,7 +35,75 @@
 								"login"
 							]
 						},
-						"description": "Login with email and password. Returns JWT token for authentication."
+						"description": "Authenticate user and get JWT token"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"carlos.ruiz@estudiante.edu.co\",\n    \"password\": \"password123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"message\": \"Login exitoso\",\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"user\": {\n        \"user_id\": 1,\n        \"full_name\": \"Carlos Ruiz\",\n        \"email\": \"carlos.ruiz@estudiante.edu.co\",\n        \"role_id\": 2,\n        \"role_name\": \"estudiante\",\n        \"institution_name\": \"Colegio San José\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"full_name\": \"Nuevo Usuario\",\n    \"email\": \"nuevo@usuario.com\",\n    \"password\": \"password123\",\n    \"role_id\": 2,\n    \"institution_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Register new user account"
 					},
 					"response": []
 				},
@@ -106,12 +128,12 @@
 								"verify"
 							]
 						},
-						"description": "Verify if the current JWT token is valid and get user information."
+						"description": "Verify JWT token validity"
 					},
 					"response": []
 				}
 			],
-			"description": "Authentication endpoints for user registration, login, and token verification."
+			"description": "Authentication endpoints for user login, registration, and token verification"
 		},
 		{
 			"name": "Books",
@@ -120,14 +142,9 @@
 					"name": "Get All Books",
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
+						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/books?search=harry&limit=10&offset=0&sort=title-asc",
+							"raw": "{{base_url}}/api/books?search=gatsby&limit=20&offset=0&sort=title-asc",
 							"host": [
 								"{{base_url}}"
 							],
@@ -138,40 +155,82 @@
 							"query": [
 								{
 									"key": "search",
-									"value": "harry",
+									"value": "gatsby",
 									"description": "Search term for title or author"
 								},
 								{
 									"key": "limit",
-									"value": "10",
-									"description": "Number of books to return"
+									"value": "20",
+									"description": "Number of books per page"
 								},
 								{
 									"key": "offset",
 									"value": "0",
-									"description": "Number of books to skip (for pagination)"
+									"description": "Number of books to skip"
 								},
 								{
 									"key": "sort",
 									"value": "title-asc",
-									"description": "Sort order (field-direction)"
+									"description": "Sort order (title-asc, title-desc, author-asc, author-desc)"
 								}
 							]
 						},
-						"description": "Get all books with optional search, pagination, and sorting. Available sort fields: title, author, publication_year, created_at. Directions: asc, desc."
+						"description": "Get all books with optional search, pagination, and sorting"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/books?search=gatsby&limit=20&offset=0&sort=title-asc",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"books"
+									],
+									"query": [
+										{
+											"key": "search",
+											"value": "gatsby"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										},
+										{
+											"key": "offset",
+											"value": "0"
+										},
+										{
+											"key": "sort",
+											"value": "title-asc"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"data\": {\n        \"books\": [\n            {\n                \"book_id\": 1,\n                \"title\": \"The Great Gatsby\",\n                \"author\": \"F. Scott Fitzgerald\",\n                \"cover_url\": \"https://covers.openlibrary.org/b/id/123456-L.jpg\",\n                \"published_year\": 1925,\n                \"description\": \"A story of the fabulously wealthy Jay Gatsby...\",\n                \"created_at\": \"2025-01-01T00:00:00.000Z\"\n            }\n        ],\n        \"total\": 1,\n        \"limit\": 20,\n        \"offset\": 0\n    }\n}"
+						}
+					]
 				},
 				{
-					"name": "Get Book Details",
+					"name": "Get Book by ID",
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{base_url}}/api/books/1",
 							"host": [
@@ -183,69 +242,47 @@
 								"1"
 							]
 						},
-						"description": "Get detailed information about a specific book by ID."
+						"description": "Get specific book details by ID"
 					},
 					"response": []
 				},
 				{
-					"name": "Get Book Content",
+					"name": "Search Books",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [
 							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
+								"key": "Content-Type",
+								"value": "application/json"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"query\": \"gatsby\",\n    \"limit\": 10,\n    \"offset\": 0\n}"
+						},
 						"url": {
-							"raw": "{{base_url}}/api/books/1/content",
+							"raw": "{{base_url}}/api/books/search",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"books",
-								"1",
-								"content"
+								"search"
 							]
 						},
-						"description": "Get book content for reading. Only accessible if the user has been assigned this book."
-					},
-					"response": []
-				},
-				{
-					"name": "Get Book Genres",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/books/genres",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"books",
-								"genres"
-							]
-						},
-						"description": "Get all available book genres for filtering."
+						"description": "Search books by title, author, or description"
 					},
 					"response": []
 				}
 			],
-			"description": "Book management endpoints for browsing, searching, and accessing book content."
+			"description": "Book management endpoints for browsing and searching the book catalog"
 		},
 		{
 			"name": "User Management",
 			"item": [
 				{
-					"name": "Get User Dashboard",
+					"name": "Get User Profile",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -255,19 +292,54 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/users/dashboard",
+							"raw": "{{base_url}}/api/users/profile",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"dashboard"
+								"profile"
 							]
 						},
-						"description": "Get user dashboard data including statistics and recent activity."
+						"description": "Get current user profile and statistics"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/users/profile",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"profile"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"data\": {\n        \"user\": {\n            \"user_id\": 1,\n            \"full_name\": \"Carlos Ruiz\",\n            \"email\": \"carlos.ruiz@estudiante.edu.co\",\n            \"institution_id\": 1,\n            \"created_at\": \"2025-01-01T00:00:00.000Z\"\n        },\n        \"stats\": {\n            \"totalBooks\": 5,\n            \"completedBooks\": 2,\n            \"currentlyReading\": 1,\n            \"totalFavorites\": 3\n        }\n    }\n}"
+						}
+					]
 				},
 				{
 					"name": "Get User Assignments",
@@ -290,9 +362,44 @@
 								"assignments"
 							]
 						},
-						"description": "Get all book assignments for the current user (student)."
+						"description": "Get all book assignments for the current user"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/users/assignments",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"assignments"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"data\": [\n        {\n            \"assignment_id\": 1,\n            \"student_id\": 1,\n            \"book_id\": 1,\n            \"status\": \"in_progress\",\n            \"progress\": 65,\n            \"assignment_date\": \"2025-01-01T00:00:00.000Z\",\n            \"last_updated\": \"2025-01-01T00:00:00.000Z\",\n            \"teacherName\": \"Profesor\",\n            \"bookTitle\": \"The Great Gatsby\",\n            \"author\": \"F. Scott Fitzgerald\",\n            \"cover_url\": \"https://covers.openlibrary.org/b/id/123456-L.jpg\",\n            \"published_year\": 1925\n        }\n    ]\n}"
+						}
+					]
 				},
 				{
 					"name": "Update Assignment Progress",
@@ -310,7 +417,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"progress\": 75\n}"
+							"raw": "{\n    \"progress\": 75,\n    \"status\": \"in_progress\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/users/assignments/1",
@@ -324,49 +431,60 @@
 								"1"
 							]
 						},
-						"description": "Update reading progress for a specific book assignment. Progress should be 0-100."
+						"description": "Update reading progress for a specific assignment"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"progress\": 75,\n    \"status\": \"in_progress\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/users/assignments/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"assignments",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"message\": \"Progreso actualizado correctamente\",\n    \"data\": {\n        \"assignment_id\": 1,\n        \"progress\": 75,\n        \"status\": \"in_progress\",\n        \"last_updated\": \"2025-01-01T00:00:00.000Z\"\n    }\n}"
+						}
+					]
 				}
 			],
-			"description": "User management endpoints for dashboard data and assignment progress."
+			"description": "User management endpoints for profile and assignment operations"
 		},
 		{
 			"name": "Teacher Functions",
 			"item": [
-				{
-					"name": "Assign Book to Student",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"studentEmail\": \"carlos.ruiz@estudiante.edu.co\",\n  \"bookId\": 1\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/teacher/assign",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"teacher",
-								"assign"
-							]
-						},
-						"description": "Assign a book to a student. Only teachers can perform this action."
-					},
-					"response": []
-				},
 				{
 					"name": "Get Teacher's Students",
 					"request": {
@@ -388,9 +506,44 @@
 								"students"
 							]
 						},
-						"description": "Get all students assigned to the current teacher."
+						"description": "Get all students for the current teacher"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/teacher/students",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"teacher",
+										"students"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"data\": [\n        {\n            \"user_id\": 1,\n            \"full_name\": \"Carlos Ruiz\",\n            \"email\": \"carlos.ruiz@estudiante.edu.co\",\n            \"role_name\": \"estudiante\",\n            \"institution_name\": \"Colegio San José\",\n            \"total_assignments\": 5,\n            \"completed_assignments\": 2\n        }\n    ]\n}"
+						}
+					]
 				},
 				{
 					"name": "Get Teacher's Assignments",
@@ -413,12 +566,184 @@
 								"assignments"
 							]
 						},
-						"description": "Get all book assignments created by the current teacher."
+						"description": "Get all assignments created by the current teacher"
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Book to Student",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"student_id\": 1,\n    \"book_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/teacher/assign",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"teacher",
+								"assign"
+							]
+						},
+						"description": "Assign a book to a student"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"student_id\": 1,\n    \"book_id\": 1\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/teacher/assign",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"teacher",
+										"assign"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"message\": \"Libro asignado exitosamente\",\n    \"data\": {\n        \"assignment_id\": 1,\n        \"student_name\": \"Carlos Ruiz\",\n        \"book_title\": \"The Great Gatsby\"\n    }\n}"
+						}
+					]
+				}
+			],
+			"description": "Teacher-specific endpoints for managing students and assignments"
+		},
+		{
+			"name": "Assignments",
+			"item": [
+				{
+					"name": "Create Assignment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"student_id\": 1,\n    \"book_id\": 1,\n    \"status\": \"pending\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/assignments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"assignments"
+							]
+						},
+						"description": "Create a new book assignment"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Assignment",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"completed\",\n    \"progress\": 100\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/assignments/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"assignments",
+								"1"
+							]
+						},
+						"description": "Update an existing assignment"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Assignment",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/assignments/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"assignments",
+								"1"
+							]
+						},
+						"description": "Delete an assignment"
 					},
 					"response": []
 				}
 			],
-			"description": "Teacher-specific endpoints for managing students and assignments."
+			"description": "Assignment management endpoints for CRUD operations"
 		}
 	],
 	"event": [

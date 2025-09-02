@@ -127,3 +127,4 @@ if (typeof Swal !== 'undefined') {
   };
   checkSweetAlert();
 }
+

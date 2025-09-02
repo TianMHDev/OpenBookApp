@@ -87,9 +87,7 @@ router.get('/students', async (req, res) => {
         const userId = req.user.user_id;
         console.log("🔍 Obteniendo estudiantes para el maestro:", userId);
         
-        // Test simple query first
-        const [testResult] = await pool.query("SELECT 1 as test");
-        console.log("✅ Test query successful:", testResult);
+        
         
         // Get students from the same institution (simplified query)
         const [students] = await pool.query(

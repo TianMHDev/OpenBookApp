@@ -316,6 +316,8 @@ router.get('/dashboard', async (req, res) => {
     }
 });
 
+
+
 // GET /api/users/assignments - Get user's assignments
 router.get('/assignments', async (req, res) => {
     try {
@@ -331,14 +333,12 @@ router.get('/assignments', async (req, res) => {
                 ba.progress,
                 ba.assignment_date,
                 ba.last_updated,
-                u.full_name as teacherName,
-                u.email as teacherEmail,
+                'Profesor' as teacherName,
                 b.title as bookTitle,
                 b.author,
                 b.cover_url,
                 b.published_year
             FROM book_assignments ba
-            JOIN users u ON ba.teacher_id = u.user_id
             JOIN books b ON ba.book_id = b.book_id
             WHERE ba.student_id = ?
             ORDER BY ba.last_updated DESC`,

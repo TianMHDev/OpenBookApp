@@ -286,3 +286,4 @@ window.SweetAlertUtils = {
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🔧 SweetAlert2 Utilities loaded');
 });
+

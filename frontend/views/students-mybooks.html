@@ -12,7 +12,6 @@
 
     <!-- Custom Styles -->
     <link rel="stylesheet" href="../styles/dashboards.css">
-
     <link rel="stylesheet" href="../styles/mybooks.css">
 </head>
 
@@ -103,297 +102,33 @@
                     <h2 class="section-title">
                         <i class="bi bi-book"></i>
                         Mi Biblioteca Personal
-                        <span class="books-count">(6 libros asignados)</span>
+                        <span class="books-count">(0 libros asignados)</span>
                     </h2>
                 </div>
 
+                <!-- Search and Filters -->
+                <div class="catalog-controls">
+                    <div class="search-container">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Buscar libros...">
+                    </div>
+                    
+                    <div class="filter-container">
+                        <button class="filter-tab active" data-filter="all">Todos</button>
+                        <button class="filter-tab" data-filter="pending">Pendientes</button>
+                        <button class="filter-tab" data-filter="in_progress">En Progreso</button>
+                        <button class="filter-tab" data-filter="completed">Completados</button>
+                    </div>
+                </div>
+
+                <!-- Books Grid -->
                 <div class="catalog-grid">
-                    <!-- Book Card 1 -->
-                    <div class="catalog-book-card">
-                        <div class="book-cover-section">
-                            <img src="/api/placeholder/160/240" alt="Don Quijote de la Mancha" class="book-cover-catalog">
-                            <div class="book-status-badge in-progress">En Progreso</div>
-                        </div>
-                        <div class="book-info-section">
-                            <h4 class="book-title-catalog">Don Quijote de la Mancha</h4>
-                            <p class="book-author-catalog">Miguel de Cervantes</p>
-                            <div class="book-meta">
-                                <span class="book-pages">
-                                    <i class="bi bi-file-text"></i>
-                                    863 páginas
-                                </span>
-                                <span class="book-assigned-by">
-                                    <i class="bi bi-person"></i>
-                                    Prof. García
-                                </span>
-                            </div>
-                            
-                            <div class="progress-section">
-                                <div class="progress-header">
-                                    <span class="progress-label">Progreso de lectura</span>
-                                    <span class="progress-percentage">35%</span>
-                                </div>
-                                <div class="progress-bar-catalog">
-                                    <div class="progress-fill" style="width: 35%;"></div>
-                                </div>
-                                <div class="progress-controls">
-                                    <label for="progress-slider-1" class="progress-control-label">Actualizar progreso:</label>
-                                    <div class="slider-container">
-                                        <input type="range" id="progress-slider-1" class="progress-slider" min="0" max="100" value="35">
-                                        <span class="slider-value">35%</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="book-actions">
-                                <button class="btn-primary btn-read">
-                                    <i class="bi bi-play-circle"></i>
-                                    Continuar Leyendo
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Book Card 2 -->
-                    <div class="catalog-book-card">
-                        <div class="book-cover-section">
-                            <img src="/api/placeholder/160/240" alt="El Principito" class="book-cover-catalog">
-                            <div class="book-status-badge completed">Completado</div>
-                        </div>
-                        <div class="book-info-section">
-                            <h4 class="book-title-catalog">El Principito</h4>
-                            <p class="book-author-catalog">Antoine de Saint-Exupéry</p>
-                            <div class="book-meta">
-                                <span class="book-pages">
-                                    <i class="bi bi-file-text"></i>
-                                    96 páginas
-                                </span>
-                                <span class="book-assigned-by">
-                                    <i class="bi bi-person"></i>
-                                    Prof. García
-                                </span>
-                            </div>
-                            
-                            <div class="progress-section">
-                                <div class="progress-header">
-                                    <span class="progress-label">Progreso de lectura</span>
-                                    <span class="progress-percentage">100%</span>
-                                </div>
-                                <div class="progress-bar-catalog">
-                                    <div class="progress-fill completed" style="width: 100%;"></div>
-                                </div>
-                                <div class="completion-badge">
-                                    <i class="bi bi-check-circle-fill"></i>
-                                    Completado el 15/08/2025
-                                </div>
-                            </div>
-
-                            <div class="book-actions">
-                                <button class="btn-primary btn-read">
-                                    <i class="bi bi-arrow-repeat"></i>
-                                    Releer
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Book Card 3 -->
-                    <div class="catalog-book-card">
-                        <div class="book-cover-section">
-                            <img src="/api/placeholder/160/240" alt="Cien años de soledad" class="book-cover-catalog">
-                            <div class="book-status-badge pending">Sin iniciar</div>
-                        </div>
-                        <div class="book-info-section">
-                            <h4 class="book-title-catalog">Cien años de soledad</h4>
-                            <p class="book-author-catalog">Gabriel García Márquez</p>
-                            <div class="book-meta">
-                                <span class="book-pages">
-                                    <i class="bi bi-file-text"></i>
-                                    471 páginas
-                                </span>
-                                <span class="book-assigned-by">
-                                    <i class="bi bi-person"></i>
-                                    Prof. Rodríguez
-                                </span>
-                            </div>
-                            
-                            <div class="progress-section">
-                                <div class="progress-header">
-                                    <span class="progress-label">Progreso de lectura</span>
-                                    <span class="progress-percentage">0%</span>
-                                </div>
-                                <div class="progress-bar-catalog">
-                                    <div class="progress-fill" style="width: 0%;"></div>
-                                </div>
-                                <div class="progress-controls">
-                                    <label for="progress-slider-3" class="progress-control-label">Actualizar progreso:</label>
-                                    <div class="slider-container">
-                                        <input type="range" id="progress-slider-3" class="progress-slider" min="0" max="100" value="0">
-                                        <span class="slider-value">0%</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="book-actions">
-                                <button class="btn-primary btn-read">
-                                    <i class="bi bi-play-circle"></i>
-                                    Empezar a Leer
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Book Card 4 -->
-                    <div class="catalog-book-card">
-                        <div class="book-cover-section">
-                            <img src="/api/placeholder/160/240" alt="Rayuela" class="book-cover-catalog">
-                            <div class="book-status-badge in-progress">En Progreso</div>
-                        </div>
-                        <div class="book-info-section">
-                            <h4 class="book-title-catalog">Rayuela</h4>
-                            <p class="book-author-catalog">Julio Cortázar</p>
-                            <div class="book-meta">
-                                <span class="book-pages">
-                                    <i class="bi bi-file-text"></i>
-                                    635 páginas
-                                </span>
-                                <span class="book-assigned-by">
-                                    <i class="bi bi-person"></i>
-                                    Prof. López
-                                </span>
-                            </div>
-                            
-                            <div class="progress-section">
-                                <div class="progress-header">
-                                    <span class="progress-label">Progreso de lectura</span>
-                                    <span class="progress-percentage">68%</span>
-                                </div>
-                                <div class="progress-bar-catalog">
-                                    <div class="progress-fill" style="width: 68%;"></div>
-                                </div>
-                                <div class="progress-controls">
-                                    <label for="progress-slider-4" class="progress-control-label">Actualizar progreso:</label>
-                                    <div class="slider-container">
-                                        <input type="range" id="progress-slider-4" class="progress-slider" min="0" max="100" value="68">
-                                        <span class="slider-value">68%</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="book-actions">
-                                <button class="btn-primary btn-read">
-                                    <i class="bi bi-play-circle"></i>
-                                    Continuar Leyendo
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Book Card 5 -->
-                    <div class="catalog-book-card">
-                        <div class="book-cover-section">
-                            <img src="/api/placeholder/160/240" alt="La casa de los espíritus" class="book-cover-catalog">
-                            <div class="book-status-badge in-progress">En Progreso</div>
-                        </div>
-                        <div class="book-info-section">
-                            <h4 class="book-title-catalog">La casa de los espíritus</h4>
-                            <p class="book-author-catalog">Isabel Allende</p>
-                            <div class="book-meta">
-                                <span class="book-pages">
-                                    <i class="bi bi-file-text"></i>
-                                    433 páginas
-                                </span>
-                                <span class="book-assigned-by">
-                                    <i class="bi bi-person"></i>
-                                    Prof. Martínez
-                                </span>
-                            </div>
-                            
-                            <div class="progress-section">
-                                <div class="progress-header">
-                                    <span class="progress-label">Progreso de lectura</span>
-                                    <span class="progress-percentage">22%</span>
-                                </div>
-                                <div class="progress-bar-catalog">
-                                    <div class="progress-fill" style="width: 22%;"></div>
-                                </div>
-                                <div class="progress-controls">
-                                    <label for="progress-slider-5" class="progress-control-label">Actualizar progreso:</label>
-                                    <div class="slider-container">
-                                        <input type="range" id="progress-slider-5" class="progress-slider" min="0" max="100" value="22">
-                                        <span class="slider-value">22%</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="book-actions">
-                                <button class="btn-primary btn-read">
-                                    <i class="bi bi-play-circle"></i>
-                                    Continuar Leyendo
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Book Card 6 -->
-                    <div class="catalog-book-card">
-                        <div class="book-cover-section">
-                            <img src="/api/placeholder/160/240" alt="Pedro Páramo" class="book-cover-catalog">
-                            <div class="book-status-badge pending">Sin iniciar</div>
-                        </div>
-                        <div class="book-info-section">
-                            <h4 class="book-title-catalog">Pedro Páramo</h4>
-                            <p class="book-author-catalog">Juan Rulfo</p>
-                            <div class="book-meta">
-                                <span class="book-pages">
-                                    <i class="bi bi-file-text"></i>
-                                    124 páginas
-                                </span>
-                                <span class="book-assigned-by">
-                                    <i class="bi bi-person"></i>
-                                    Prof. García
-                                </span>
-                            </div>
-                            
-                            <div class="progress-section">
-                                <div class="progress-header">
-                                    <span class="progress-label">Progreso de lectura</span>
-                                    <span class="progress-percentage">0%</span>
-                                </div>
-                                <div class="progress-bar-catalog">
-                                    <div class="progress-fill" style="width: 0%;"></div>
-                                </div>
-                                <div class="progress-controls">
-                                    <label for="progress-slider-6" class="progress-control-label">Actualizar progreso:</label>
-                                    <div class="slider-container">
-                                        <input type="range" id="progress-slider-6" class="progress-slider" min="0" max="100" value="0">
-                                        <span class="slider-value">0%</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="book-actions">
-                                <button class="btn-primary btn-read">
-                                    <i class="bi bi-play-circle"></i>
-                                    Empezar a Leer
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Los libros se cargarán dinámicamente aquí -->
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <!-- SweetAlert2 Configuration -->
-    <script src="../js/config/sweetalert-config.js"></script>
-    
-    <!-- SweetAlert2 Utilities -->
-    <script src="../js/utils/sweetalert-utils.js"></script>
-    
     <!-- Scripts -->
     <script src="../js/students-mybooks.js"></script>
 </body>
