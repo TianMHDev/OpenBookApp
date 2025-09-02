@@ -11,19 +11,44 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout
+    - name: Checkout code
       uses: actions/checkout@v3
       
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18'
+        node-version: '16'
         
     - name: Install dependencies
-      run: npm install
+      run: npm ci
       
+    - name: Build frontend for production
+      run: |
+        # Create production build directory
+        mkdir -p dist
+        
+        # Copy frontend files
+        cp -r frontend/* dist/
+        
+        # Update API configuration for production
+        sed -i 's|http://localhost:3000/api|https://your-backend-domain.com/api|g' dist/js/config.js
+        
+        # Create index.html redirect
+        echo '<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>OpenBook - Digital Learning Platform</title>
+            <meta http-equiv="refresh" content="0; url=views/login.html">
+        </head>
+        <body>
+            <p>Redirecting to <a href="views/login.html">OpenBook</a>...</p>
+        </body>
+        </html>' > dist/index.html
+        
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./frontend
+        publish_dir: ./dist
+        cname: your-domain.com  # Optional: Add your custom domain

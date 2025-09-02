@@ -311,18 +311,6 @@ CMD ["npm", "start"]
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
-
-### **Documentation**
-- [API Documentation](docs/api.md)
-- [Database Schema](docs/database.md)
-- [Deployment Guide](docs/deployment.md)
-
-### **Contact**
-- **Email**: support@openbook.com
-- **Issues**: [GitHub Issues](https://github.com/your-username/openbook-backend/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/openbook-backend/discussions)
-
 ## 🎉 Acknowledgments
 
 - **OpenLibrary API** for book cover images

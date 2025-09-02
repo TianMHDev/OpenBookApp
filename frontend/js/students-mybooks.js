@@ -2,7 +2,7 @@
 // STUDENTS MY BOOKS JAVASCRIPT - RE-IMPLEMENTED
 // ============================================================================
 
-const API_ROOT = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+const API_ROOT = window.APP_CONFIG ? window.APP_CONFIG.apiBaseUrl : 'http://localhost:3000/api';
 
 console.log("🔗 API_ROOT configurado:", API_ROOT);
 
