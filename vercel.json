@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "backend/app/index.js",
+      "src": "api/index.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/backend/app/index.js"
+      "dest": "/api/index.js"
     },
     {
       "src": "/frontend/(.*)",
@@ -29,18 +29,15 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/backend/app/index.js"
+      "dest": "/api/index.js"
     }
   ],
   "env": {
     "NODE_ENV": "production"
   },
   "functions": {
-    "backend/app/index.js": {
+    "api/index.js": {
       "maxDuration": 30
     }
-  },
-  "buildCommand": "npm run build",
-  "outputDirectory": ".",
-  "installCommand": "npm install"
+  }
 }
