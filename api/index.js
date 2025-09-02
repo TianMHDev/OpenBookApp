@@ -8,8 +8,22 @@ import apiRoutes from '../backend/routes/index.js';
 
 const app = express();
 
-// Basic middleware
-app.use(cors());
+// CORS configuration
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:8000',
+    'http://localhost:5173',
+    'https://open-book-app-web.vercel.app',
+    'https://open-book-app.vercel.app',
+    process.env.FRONTEND_URL
+  ].filter(Boolean),
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Initialize database connection
@@ -48,6 +62,31 @@ app.get('/api/health', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Health check failed',
+      error: error.message
+    });
+  }
+});
+
+// Initialize database endpoint
+app.post('/api/init-db', async (req, res) => {
+  try {
+    console.log("🔄 Manually initializing database...");
+    await initializeDatabase();
+    dbInitialized = true;
+    
+    res.json({
+      success: true,
+      message: 'Database initialized successfully',
+      timestamp: new Date().toISOString(),
+      database: {
+        initialized: true,
+        status: 'connected'
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Database initialization failed',
       error: error.message
     });
   }

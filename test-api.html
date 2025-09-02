@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenBook API Tester</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .url-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .url-display strong {
+            color: #007bff;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .test-header {
+            background: #007bff;
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .test-buttons {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .test-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .test-btn.danger {
+            background: #dc3545;
+        }
+        
+        .test-btn.danger:hover {
+            background: #c82333;
+        }
+        
+        .test-btn.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .test-btn.warning:hover {
+            background: #e0a800;
+        }
+        
+        .results {
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .result-item.success {
+            border-left: 4px solid #28a745;
+            background: #d4edda;
+        }
+        
+        .result-item.error {
+            border-left: 4px solid #dc3545;
+            background: #f8d7da;
+        }
+        
+        .result-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .result-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .status-error {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .result-body {
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .clear-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .clear-btn:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 OpenBook API Tester</h1>
+        
+        <div class="url-display">
+            <strong>URL Base:</strong> <span id="baseUrl">https://open-book-app-jwbcwtyo6-jadensmithahr-8971s-projects.vercel.app</span>
+        </div>
+        
+        <!-- Health Tests -->
+        <div class="test-section">
+            <div class="test-header">🏥 Health & System Tests</div>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="testEndpoint('/')">Test Main Endpoint</button>
+                <button class="test-btn" onclick="testEndpoint('/api/health')">Health Check</button>
+                <button class="test-btn" onclick="testEndpoint('/api/test-db')">Database Test</button>
+                <button class="test-btn" onclick="testEndpoint('/api/env-info')">Environment Info</button>
+            </div>
+        </div>
+        
+        <!-- Auth Tests -->
+        <div class="test-section">
+            <div class="test-header">🔐 Authentication Tests</div>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="testAuthRegister()">Register User</button>
+                <button class="test-btn" onclick="testAuthLogin()">Login User</button>
+                <button class="test-btn" onclick="testAuthVerify()">Verify Token</button>
+            </div>
+        </div>
+        
+        <!-- Book Tests -->
+        <div class="test-section">
+            <div class="test-header">📚 Book Management Tests</div>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="testEndpoint('/api/books')">Get All Books</button>
+                <button class="test-btn" onclick="testEndpoint('/api/books?search=harry')">Search Books</button>
+                <button class="test-btn" onclick="testEndpoint('/api/books/genres')">Get Genres</button>
+                <button class="test-btn" onclick="testEndpoint('/api/books/1')">Get Book by ID</button>
+            </div>
+        </div>
+        
+        <!-- User Tests -->
+        <div class="test-section">
+            <div class="test-header">👤 User Management Tests</div>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="testEndpoint('/api/users/profile')">Get Profile</button>
+                <button class="test-btn" onclick="testEndpoint('/api/users/favorites')">Get Favorites</button>
+                <button class="test-btn warning" onclick="testUpdateProfile()">Update Profile</button>
+            </div>
+        </div>
+        
+        <!-- Teacher Tests -->
+        <div class="test-section">
+            <div class="test-header">👨‍🏫 Teacher Functions Tests</div>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="testEndpoint('/api/teacher/students')">Get Students</button>
+                <button class="test-btn" onclick="testEndpoint('/api/teacher/assignments')">Get Assignments</button>
+            </div>
+        </div>
+        
+        <!-- Results -->
+        <div class="results" id="results"></div>
+        
+        <button class="clear-btn" onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <script>
+        const BASE_URL = 'https://open-book-app-jwbcwtyo6-jadensmithahr-8971s-projects.vercel.app';
+        let authToken = localStorage.getItem('openbook_token');
+        
+        // Test data
+        const testUser = {
+            email: 'test@example.com',
+            password: 'testpassword123',
+            full_name: 'Test User',
+            role_id: 2,
+            institution_id: 1
+        };
+        
+        async function makeRequest(endpoint, options = {}) {
+            const url = `${BASE_URL}${endpoint}`;
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
+                    ...options.headers
+                }
+            };
+            
+            try {
+                const response = await fetch(url, { ...defaultOptions, ...options });
+                const data = await response.json();
+                
+                return {
+                    success: response.ok,
+                    status: response.status,
+                    data: data,
+                    endpoint: endpoint,
+                    method: options.method || 'GET'
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    error: error.message,
+                    endpoint: endpoint,
+                    method: options.method || 'GET'
+                };
+            }
+        }
+        
+        function addResult(result) {
+            const resultsDiv = document.getElementById('results');
+            const resultItem = document.createElement('div');
+            resultItem.className = `result-item ${result.success ? 'success' : 'error'}`;
+            
+            const statusClass = result.success ? 'status-success' : 'status-error';
+            const statusText = result.success ? 'SUCCESS' : 'ERROR';
+            
+            resultItem.innerHTML = `
+                <div class="result-header">
+                    ${result.method} ${result.endpoint}
+                    <span class="result-status ${statusClass}">${result.status || 'N/A'}</span>
+                </div>
+                <div class="result-body">${JSON.stringify(result.data || result.error, null, 2)}</div>
+            `;
+            
+            resultsDiv.insertBefore(resultItem, resultsDiv.firstChild);
+        }
+        
+        async function testEndpoint(endpoint) {
+            const result = await makeRequest(endpoint);
+            addResult(result);
+        }
+        
+        async function testAuthRegister() {
+            const result = await makeRequest('/api/auth/register', {
+                method: 'POST',
+                body: JSON.stringify(testUser)
+            });
+            addResult(result);
+        }
+        
+        async function testAuthLogin() {
+            const result = await makeRequest('/api/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({
+                    email: testUser.email,
+                    password: testUser.password
+                })
+            });
+            
+            if (result.success && result.data.token) {
+                authToken = result.data.token;
+                localStorage.setItem('openbook_token', authToken);
+                console.log('✅ Token guardado');
+            }
+            
+            addResult(result);
+        }
+        
+        async function testAuthVerify() {
+            const result = await makeRequest('/api/auth/verify');
+            addResult(result);
+        }
+        
+        async function testUpdateProfile() {
+            const result = await makeRequest('/api/users/profile', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    full_name: 'Updated Test User'
+                })
+            });
+            addResult(result);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        // Auto-test on load
+        window.addEventListener('load', async () => {
+            console.log('🚀 OpenBook API Tester loaded');
+            console.log(`📍 Testing URL: ${BASE_URL}`);
+            
+            // Test main endpoint automatically
+            await testEndpoint('/');
+        });
+    </script>
+</body>
+</html>
