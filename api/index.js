@@ -1,6 +1,7 @@
 // Vercel Serverless Function Entry Point
 import express from 'express';
 import cors from 'cors';
+import { pool, initializeDatabase } from '../backend/database/conexion_db.js';
 
 const app = express();
 
@@ -8,30 +9,99 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Initialize database connection
+let dbInitialized = false;
+
+const initializeApp = async () => {
+  if (!dbInitialized) {
+    try {
+      console.log("🔄 Initializing database connection...");
+      await initializeDatabase();
+      dbInitialized = true;
+      console.log("✅ Database initialized successfully");
+    } catch (error) {
+      console.error("❌ Database initialization failed:", error.message);
+      // Continue without database
+    }
+  }
+};
+
 // Simple health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({
-    success: true,
-    message: 'OpenBook Backend is running!',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'unknown'
-  });
+app.get('/api/health', async (req, res) => {
+  try {
+    await initializeApp();
+    
+    res.json({
+      success: true,
+      message: 'OpenBook Backend is running!',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'unknown',
+      database: {
+        initialized: dbInitialized,
+        status: dbInitialized ? 'connected' : 'failed'
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Health check failed',
+      error: error.message
+    });
+  }
 });
 
-// Database test endpoint (without actual DB connection)
-app.get('/api/test-db', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Database test endpoint working (no connection yet)',
-    timestamp: new Date().toISOString(),
-    env: {
-      hasDbHost: !!process.env.DB_HOST,
-      hasDbUser: !!process.env.DB_USER,
-      hasDbPassword: !!process.env.DB_PASSWORD,
-      hasDbName: !!process.env.DB_NAME,
-      hasDbPort: !!process.env.DB_PORT
+// Database test endpoint
+app.get('/api/test-db', async (req, res) => {
+  try {
+    await initializeApp();
+    
+    if (!dbInitialized) {
+      return res.status(500).json({
+        success: false,
+        message: 'Database not initialized',
+        env: {
+          hasDbHost: !!process.env.DB_HOST,
+          hasDbUser: !!process.env.DB_USER,
+          hasDbPassword: !!process.env.DB_PASSWORD,
+          hasDbName: !!process.env.DB_NAME,
+          hasDbPort: !!process.env.DB_PORT
+        }
+      });
     }
-  });
+
+    // Test database query
+    const [rows] = await pool.query("SELECT COUNT(*) as count FROM books");
+    
+    res.json({
+      success: true,
+      message: 'Database connection successful',
+      timestamp: new Date().toISOString(),
+      data: {
+        bookCount: rows[0].count,
+        connectionStatus: 'active'
+      },
+      env: {
+        hasDbHost: !!process.env.DB_HOST,
+        hasDbUser: !!process.env.DB_USER,
+        hasDbPassword: !!process.env.DB_PASSWORD,
+        hasDbName: !!process.env.DB_NAME,
+        hasDbPort: !!process.env.DB_PORT
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Database test failed',
+      error: error.message,
+      env: {
+        hasDbHost: !!process.env.DB_HOST,
+        hasDbUser: !!process.env.DB_USER,
+        hasDbPassword: !!process.env.DB_PASSWORD,
+        hasDbName: !!process.env.DB_NAME,
+        hasDbPort: !!process.env.DB_PORT
+      }
+    });
+  }
 });
 
 // Environment info endpoint
@@ -45,7 +115,8 @@ app.get('/api/env-info', (req, res) => {
       hasDbHost: !!process.env.DB_HOST,
       hasDbUser: !!process.env.DB_USER,
       hasDbPassword: !!process.env.DB_PASSWORD,
-      hasDbName: !!process.env.DB_NAME
+      hasDbName: !!process.env.DB_NAME,
+      databaseInitialized: dbInitialized
     }
   });
 });
@@ -77,7 +148,8 @@ app.get('*', (req, res) => {
       hasDbName: !!process.env.DB_NAME,
       hasDbPort: !!process.env.DB_PORT,
       hasJwtSecret: !!process.env.JWT_SECRET,
-      nodeEnv: process.env.NODE_ENV
+      nodeEnv: process.env.NODE_ENV,
+      databaseInitialized: dbInitialized
     }
   });
 });
