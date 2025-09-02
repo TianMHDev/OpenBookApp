@@ -29,9 +29,6 @@ const initializeApp = async () => {
   }
 };
 
-// Mount all API routes under /api
-app.use('/api', apiRoutes);
-
 // Simple health check endpoint
 app.get('/api/health', async (req, res) => {
   try {
@@ -110,23 +107,6 @@ app.get('/api/test-db', async (req, res) => {
   }
 });
 
-// Environment info endpoint
-app.get('/api/env-info', (req, res) => {
-  res.json({
-    success: true,
-    data: {
-      nodeEnv: process.env.NODE_ENV || 'unknown',
-      port: process.env.PORT || 'unknown',
-      timestamp: new Date().toISOString(),
-      hasDbHost: !!process.env.DB_HOST,
-      hasDbUser: !!process.env.DB_USER,
-      hasDbPassword: !!process.env.DB_PASSWORD,
-      hasDbName: !!process.env.DB_NAME,
-      databaseInitialized: dbInitialized
-    }
-  });
-});
-
 // Database initialization endpoint
 app.get('/api/init-db', async (req, res) => {
   try {
@@ -189,6 +169,26 @@ app.get('/api/init-db', async (req, res) => {
       error: error.message
     });
   }
+});
+
+// Mount all API routes under /api
+app.use('/api', apiRoutes);
+
+// Environment info endpoint
+app.get('/api/env-info', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      nodeEnv: process.env.NODE_ENV || 'unknown',
+      port: process.env.PORT || 'unknown',
+      timestamp: new Date().toISOString(),
+      hasDbHost: !!process.env.DB_HOST,
+      hasDbUser: !!process.env.DB_USER,
+      hasDbPassword: !!process.env.DB_PASSWORD,
+      hasDbName: !!process.env.DB_NAME,
+      databaseInitialized: dbInitialized
+    }
+  });
 });
 
 // Catch-all for API routes
