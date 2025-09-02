@@ -86,6 +86,9 @@ app.get('/api/test-db', async (req, res) => {
       });
     }
 
+    // Import dbConfig to show actual configuration
+    const { dbConfig } = await import('../backend/config/vercel.js');
+    
     // Test database query with better error handling
     try {
       const [rows] = await pool.query("SELECT COUNT(*) as count FROM books");
@@ -98,6 +101,13 @@ app.get('/api/test-db', async (req, res) => {
           bookCount: rows[0].count,
           connectionStatus: 'active'
         },
+        config: {
+          host: dbConfig.host,
+          port: dbConfig.port,
+          database: dbConfig.database,
+          user: dbConfig.user,
+          ssl: !!dbConfig.ssl
+        },
         env: {
           hasDbHost: !!process.env.DB_HOST,
           hasDbUser: !!process.env.DB_USER,
@@ -107,7 +117,8 @@ app.get('/api/test-db', async (req, res) => {
           dbHost: process.env.DB_HOST,
           dbPort: process.env.DB_PORT,
           dbName: process.env.DB_NAME,
-          dbUser: process.env.DB_USER
+          dbUser: process.env.DB_USER,
+          nodeEnv: process.env.NODE_ENV
         }
       });
     } catch (dbError) {
@@ -115,12 +126,20 @@ app.get('/api/test-db', async (req, res) => {
         success: false,
         message: 'Database query failed',
         error: dbError.message,
+        config: {
+          host: dbConfig.host,
+          port: dbConfig.port,
+          database: dbConfig.database,
+          user: dbConfig.user,
+          ssl: !!dbConfig.ssl
+        },
         env: {
           hasDbHost: !!process.env.DB_HOST,
           hasDbUser: !!process.env.DB_USER,
           hasDbPassword: !!process.env.DB_PASSWORD,
           hasDbName: !!process.env.DB_NAME,
-          hasDbPort: !!process.env.DB_PORT
+          hasDbPort: !!process.env.DB_PORT,
+          nodeEnv: process.env.NODE_ENV
         }
       });
     }
@@ -134,7 +153,8 @@ app.get('/api/test-db', async (req, res) => {
         hasDbUser: !!process.env.DB_USER,
         hasDbPassword: !!process.env.DB_PASSWORD,
         hasDbName: !!process.env.DB_NAME,
-        hasDbPort: !!process.env.DB_PORT
+        hasDbPort: !!process.env.DB_PORT,
+        nodeEnv: process.env.NODE_ENV
       }
     });
   }
