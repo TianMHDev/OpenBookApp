@@ -13,63 +13,127 @@ import apiRoutes from '../backend/routes/index.js';
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 
-app.use(cors(corsConfig));
+// Safe middleware setup
+app.use(cors(corsConfig || {}));
 app.use(express.json());
 
-// Configure static files
-app.use('/frontend', express.static('frontend'));
-app.use('/assets', express.static('frontend/assets'));
-app.use('/styles', express.static('frontend/styles'));
-app.use(express.static('frontend'));
+// Configure static files with error handling
+try {
+  app.use('/frontend', express.static('frontend'));
+  app.use('/assets', express.static('frontend/assets'));
+  app.use('/styles', express.static('frontend/styles'));
+  app.use(express.static('frontend'));
+} catch (error) {
+  console.error('❌ Error setting up static files:', error.message);
+}
 
 // Mount all API routes under /api
-app.use('/api', apiRoutes);
+try {
+  app.use('/api', apiRoutes);
+} catch (error) {
+  console.error('❌ Error setting up API routes:', error.message);
+}
 
-// Frontend routes
+// Frontend routes with error handling
 app.get('/', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/index.html'));
+    try {
+        res.sendFile(path.resolve('frontend/views/index.html'));
+    } catch (error) {
+        console.error('❌ Error serving index:', error.message);
+        res.status(500).json({ success: false, message: 'Error serving page' });
+    }
 });
 
 app.get('/login', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/login.html'));
+    try {
+        res.sendFile(path.resolve('frontend/views/login.html'));
+    } catch (error) {
+        console.error('❌ Error serving login:', error.message);
+        res.status(500).json({ success: false, message: 'Error serving page' });
+    }
 });
 
 app.get('/register', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/register.html'));
+    try {
+        res.sendFile(path.resolve('frontend/views/register.html'));
+    } catch (error) {
+        console.error('❌ Error serving register:', error.message);
+        res.status(500).json({ success: false, message: 'Error serving page' });
+    }
 });
 
 // Teacher routes
 app.get('/teacher-dashboard', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/teacher-dashboard.html'));
+    try {
+        res.sendFile(path.resolve('frontend/views/teacher-dashboard.html'));
+    } catch (error) {
+        console.error('❌ Error serving teacher dashboard:', error.message);
+        res.status(500).json({ success: false, message: 'Error serving page' });
+    }
 });
 
 app.get('/teacher-catalog', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/teacher-catalog.html'));
+    try {
+        res.sendFile(path.resolve('frontend/views/teacher-catalog.html'));
+    } catch (error) {
+        console.error('❌ Error serving teacher catalog:', error.message);
+        res.status(500).json({ success: false, message: 'Error serving page' });
+    }
 });
 
 app.get('/teacher-favs', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/teacher-favs.html'));
+    try {
+        res.sendFile(path.resolve('frontend/views/teacher-favs.html'));
+    } catch (error) {
+        console.error('❌ Error serving teacher favs:', error.message);
+        res.status(500).json({ success: false, message: 'Error serving page' });
+    }
 });
 
 app.get('/teacher-mystudents', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/teacher-mystudents.html'));
+    try {
+        res.sendFile(path.resolve('frontend/views/teacher-mystudents.html'));
+    } catch (error) {
+        console.error('❌ Error serving teacher mystudents:', error.message);
+        res.status(500).json({ success: false, message: 'Error serving page' });
+    }
 });
 
 // Student routes
 app.get('/student-dashboard', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/student-dashboard.html'));
+    try {
+        res.sendFile(path.resolve('frontend/views/student-dashboard.html'));
+    } catch (error) {
+        console.error('❌ Error serving student dashboard:', error.message);
+        res.status(500).json({ success: false, message: 'Error serving page' });
+    }
 });
 
 app.get('/student-catalog', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/student-catalog.html'));
+    try {
+        res.sendFile(path.resolve('frontend/views/student-catalog.html'));
+    } catch (error) {
+        console.error('❌ Error serving student catalog:', error.message);
+        res.status(500).json({ success: false, message: 'Error serving page' });
+    }
 });
 
 app.get('/student-favs', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/student-favs.html'));
+    try {
+        res.sendFile(path.resolve('frontend/views/student-favs.html'));
+    } catch (error) {
+        console.error('❌ Error serving student favs:', error.message);
+        res.status(500).json({ success: false, message: 'Error serving page' });
+    }
 });
 
 app.get('/students-mybooks', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/students-mybooks.html'));
+    try {
+        res.sendFile(path.resolve('frontend/views/students-mybooks.html'));
+    } catch (error) {
+        console.error('❌ Error serving students mybooks:', error.message);
+        res.status(500).json({ success: false, message: 'Error serving page' });
+    }
 });
 
 // Error handling
@@ -81,13 +145,18 @@ app.use('/api/*', (req, res) => {
 });
 
 app.use('*', (req, res) => {
-    if (req.path.includes('.')) {
+    if (req.path && req.path.includes('.')) {
         return res.status(404).json({
             success: false,
             message: `Archivo no encontrado: ${req.path}`
         });
     }
-    res.sendFile(path.resolve('frontend/views/index.html'));
+    try {
+        res.sendFile(path.resolve('frontend/views/index.html'));
+    } catch (error) {
+        console.error('❌ Error serving catch-all route:', error.message);
+        res.status(500).json({ success: false, message: 'Error interno del servidor' });
+    }
 });
 
 app.use((error, req, res, next) => {
@@ -105,7 +174,7 @@ const initializeApp = async () => {
     if (!dbInitialized) {
         try {
             console.log("🚀 Starting OpenBook Backend...");
-            console.log(`🌍 Environment: ${serverConfig.nodeEnv}`);
+            console.log(`🌍 Environment: ${serverConfig?.nodeEnv || 'unknown'}`);
             
             // Debug environment variables
             debugEnv();
@@ -118,7 +187,7 @@ const initializeApp = async () => {
             // Check if database is empty and sync if needed
             try {
                 const [rows] = await pool.query("SELECT COUNT(*) as count FROM books");
-                if (rows[0].count === 0) {
+                if (rows && rows[0] && rows[0].count === 0) {
                     console.log("📚 Database is empty. Starting synchronization...");
                     await sincronizarTodosLosGeneros();
                 } else {
@@ -138,6 +207,8 @@ const initializeApp = async () => {
 // Export for Vercel serverless
 export default async function handler(req, res) {
     try {
+        console.log(`📥 Request: ${req.method} ${req.url}`);
+        
         await initializeApp();
         
         // Handle the request with Express
@@ -151,6 +222,7 @@ export default async function handler(req, res) {
                     });
                     resolve();
                 } else {
+                    console.log(`✅ Request completed: ${req.method} ${req.url}`);
                     resolve();
                 }
             });
