@@ -1,7 +1,5 @@
-// ============================================================================
-// TEACHER DASHBOARD JAVASCRIPT
-// ============================================================================
 
+// TEACHER DASHBOARD JAVASCRIPT
 const API_ROOT = window.APP_CONFIG ? window.APP_CONFIG.apiBaseUrl : 'http://localhost:3000/api';
 
 console.log("🔗 API_ROOT configurado:", API_ROOT);
@@ -722,8 +720,15 @@ function setupLogout() {
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
       console.log("🚪 Cerrando sesión...");
-      localStorage.removeItem('token');
-      window.location.href = '/login.html';
+      
+      // Mostrar confirmación antes de cerrar sesión
+      if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userData');
+        console.log("✅ Sesión cerrada - redirigiendo a login");
+        alert('Sesión cerrada correctamente');
+        window.location.href = '../views/login.html';
+      }
     });
   }
 }

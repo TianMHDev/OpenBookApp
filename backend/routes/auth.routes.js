@@ -131,7 +131,7 @@ router.post('/register', async (req, res) => {
 
         // Check if user already exists
         const [existingUsers] = await pool.query(
-            "SELECT id FROM users WHERE email = ? OR national_id = ?",
+            "SELECT user_id FROM users WHERE email = ? OR national_id = ?",
             [email.toLowerCase(), national_id]
         );
 
@@ -154,17 +154,15 @@ router.post('/register', async (req, res) => {
                 password, 
                 role_id, 
                 institution_id, 
-                institution_name, 
                 created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
+            ) VALUES (?, ?, ?, ?, ?, ?, NOW())`,
             [
                 full_name, 
                 national_id, 
                 email.toLowerCase(), 
                 hashedPassword, 
                 role_id, 
-                institution_id || null, 
-                institution_name || null
+                institution_id || null
             ]
         );
 

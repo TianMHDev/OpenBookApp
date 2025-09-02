@@ -423,8 +423,16 @@ function setupEventListeners() {
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-      localStorage.removeItem('token');
-      window.location.href = '/login.html';
+      console.log("🚪 Cerrando sesión...");
+      
+      // Mostrar confirmación antes de cerrar sesión
+      if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userData');
+        console.log("✅ Sesión cerrada - redirigiendo a login");
+        alert('Sesión cerrada correctamente');
+        window.location.href = '../views/login.html';
+      }
     });
   }
   

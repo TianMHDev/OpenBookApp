@@ -63,6 +63,9 @@ async function handleLogin(e) {
     saveUserSession(data);
     console.log("Sesión guardada. Datos del usuario:", data.user);
     
+    // Mostrar alerta de éxito
+    alert(`¡Inicio de sesión exitoso! Bienvenido ${data.user.full_name}`);
+    
     // Verificar que se guardó correctamente
     const savedToken = localStorage.getItem('token');
     const savedUserData = localStorage.getItem('userData');
@@ -144,8 +147,8 @@ async function handleRegister(event) {
         return;
     }
 
-    // Show charging status
-    showLoadingState('Registrando usuario...');
+    // Show loading state
+    console.log('Registrando usuario...');
 
     try {
         // Send data to the backend for validation and actual registration
@@ -173,19 +176,17 @@ async function handleRegister(event) {
         }
 
         // Successful registration
-        showSuccessMessage('¡Registro exitoso! Puedes iniciar sesión ahora.');
+        alert('¡Registro exitoso! Tu cuenta ha sido creada correctamente.');
         resetRegistrationForm();
         
-        // Optional: Automatically redirect to login
+        // Automatically redirect to login
         setTimeout(() => {
             window.location.href = '../views/login.html';
-        }, 2000);
+        }, 1000);
 
     } catch (error) {
         console.error('Error de conexión en registro:', error);
         showGlobalError('Error de conexión. Verifica tu internet e intenta nuevamente.');
-    } finally {
-        hideLoadingState();
     }
 }
 
@@ -197,6 +198,17 @@ function validateEmailFormatUX(email, role) {
     
     return emailLowerCase.endsWith(expectedDomain) && 
         emailLowerCase.length > expectedDomain.length;
+}
+
+function validatePasswordStrength(password) {
+    if (!password) return false;
+    
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasMinLength = password.length >= 8;
+    
+    return hasUpperCase && hasLowerCase && hasNumbers && hasMinLength;
 }
 
 /**
@@ -227,20 +239,14 @@ function validateFormDataClient(formData) {
     } else {
         // Check domain based on selected role
         if (formData.role && !validateEmailFormatUX(formData.email, formData.role)) {
-            errors.email = `El correo debe terminar en ${ROLE_CONFIG[formData.role].domain}`;
+            errors.email = 'Este correo no está asignado por la institución';
             isValid = false;
         }
     }
 
-    // Validate role-specific email domain
-    if (formData.email && formData.role && !validateEmailFormatUX(formData.email, formData.role)) {
-        errors.email = `El correo debe terminar en ${ROLE_CONFIG[formData.role].domain}`;
-        isValid = false;
-    }
-
     // Validate password strength
-    if (!formData.password || formData.password.length < 8) {
-        errors.password = 'La contraseña debe tener al menos 8 caracteres';
+    if (!formData.password || !validatePasswordStrength(formData.password)) {
+        errors.password = 'La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas y números';
         isValid = false;
     }
 
@@ -382,7 +388,7 @@ function showSuccessMessage(message) {
  * @param {string} message - Error message
  */
 function showGlobalError(message) {
-    alert(message); // Simple alert for now
+    alert(message);
 }
 
 /**
@@ -466,7 +472,7 @@ function handleLoginError(status, data, emailError, passwordError) {
  */
 function handleRegistrationError(status, data) {
     // Backend-specific errors are displayed directly
-// since the backend strictly validates everything
+    // since the backend strictly validates everything
     const errorMessages = {
         'EMAIL_EXISTS': 'Este correo ya está registrado',
         'ID_EXISTS': 'Este número de identificación ya está registrado',
@@ -476,7 +482,7 @@ function handleRegistrationError(status, data) {
     };
 
     const message = errorMessages[data.error] || data.mensaje || 'Error en el registro';
-    showGlobalError(message);
+    alert(message);
 }
 
 // =====================================================================
@@ -568,10 +574,15 @@ function getToken() {
  */
 function logout() {
   console.log("🚪 Cerrando sesión...");
-  localStorage.removeItem('token');
-  localStorage.removeItem('userData');
-  console.log("✅ Sesión cerrada - redirigiendo a login");
-  window.location.href = '../views/login.html';
+  
+  // Mostrar confirmación antes de cerrar sesión
+  if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userData');
+    console.log("✅ Sesión cerrada - redirigiendo a login");
+    alert('Sesión cerrada correctamente');
+    window.location.href = '../views/login.html';
+  }
 }
 
 // =====================================================================
@@ -595,6 +606,38 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
+ * Updates password strength indicator
+ */
+function updatePasswordStrength(password) {
+    const strengthBar = document.querySelector('.strength-bar');
+    if (!strengthBar) return;
+
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasMinLength = password.length >= 8;
+
+    let strength = 0;
+    let color = '#dc3545'; // Red
+
+    if (hasMinLength) strength += 25;
+    if (hasLowerCase) strength += 25;
+    if (hasUpperCase) strength += 25;
+    if (hasNumbers) strength += 25;
+
+    if (strength >= 100) {
+        color = '#28a745'; // Green
+    } else if (strength >= 75) {
+        color = '#ffc107'; // Yellow
+    } else if (strength >= 50) {
+        color = '#fd7e14'; // Orange
+    }
+
+    strengthBar.style.width = strength + '%';
+    strengthBar.style.backgroundColor = color;
+}
+
+/**
  * Sets up real-time validation for registration form fields
  */
 function setupRealTimeValidation() {
@@ -606,6 +649,10 @@ function setupRealTimeValidation() {
         });
         fullNameInput.addEventListener('input', () => {
             clearFieldError(document.getElementById('fullName-error'));
+            // Validate in real-time as user types
+            if (fullNameInput.value.trim().length >= 3) {
+                validateField('fullName', fullNameInput.value.trim());
+            }
         });
     }
 
@@ -617,6 +664,10 @@ function setupRealTimeValidation() {
         });
         nationalIdInput.addEventListener('input', () => {
             clearFieldError(document.getElementById('ID-error'));
+            // Validate in real-time as user types
+            if (nationalIdInput.value.trim().length >= 7) {
+                validateField('nationalId', nationalIdInput.value.trim());
+            }
         });
     }
 
@@ -628,6 +679,10 @@ function setupRealTimeValidation() {
         });
         emailInput.addEventListener('input', () => {
             clearFieldError(document.getElementById('email-error'));
+            // Validate in real-time as user types
+            if (emailInput.value.trim().includes('@')) {
+                validateField('email', emailInput.value.trim());
+            }
         });
     }
 
@@ -639,6 +694,11 @@ function setupRealTimeValidation() {
         });
         passwordInput.addEventListener('input', () => {
             clearFieldError(document.getElementById('password-error'));
+            updatePasswordStrength(passwordInput.value);
+            // Validate in real-time as user types
+            if (passwordInput.value.length >= 8) {
+                validateField('password', passwordInput.value);
+            }
         });
     }
 
@@ -698,14 +758,14 @@ function validateField(fieldName, value) {
                 
                 if (selectedRole && !validateEmailFormatUX(value, selectedRole)) {
                     isValid = false;
-                    errorMessage = `El correo debe terminar en ${ROLE_CONFIG[selectedRole].domain}`;
+                    errorMessage = 'Este correo no está asignado por la institución';
                 }
             }
             break;
         case 'password':
-            if (!value || value.length < 8) {
+            if (!value || !validatePasswordStrength(value)) {
                 isValid = false;
-                errorMessage = 'La contraseña debe tener al menos 8 caracteres';
+                errorMessage = 'La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas y números';
             }
             break;
     }

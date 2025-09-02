@@ -409,10 +409,15 @@ function setupLogout() {
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
+      console.log("🚪 Cerrando sesión...");
+      
+      // Mostrar confirmación antes de cerrar sesión
       if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-        console.log("🚪 Cerrando sesión...");
         localStorage.removeItem('token');
-        window.location.href = '/login.html';
+        localStorage.removeItem('userData');
+        console.log("✅ Sesión cerrada - redirigiendo a login");
+        alert('Sesión cerrada correctamente');
+        window.location.href = '../views/login.html';
       }
     });
   }
