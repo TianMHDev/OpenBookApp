@@ -130,7 +130,9 @@ app.get('/api/test-db', async (req, res) => {
           hasDbName: !!process.env.DB_NAME,
           hasDbPort: !!process.env.DB_PORT,
           dbHost: process.env.DB_HOST,
-          dbPort: process.env.DB_PORT
+          dbPort: process.env.DB_PORT,
+          dbName: process.env.DB_NAME,
+          dbUser: process.env.DB_USER
         }
       });
     } catch (dbError) {
@@ -150,7 +152,7 @@ app.get('/api/test-db', async (req, res) => {
 });
 
 // Database initialization endpoint
-app.get('/api/init-db', async (req, res) => {
+app.post('/api/init-db', async (req, res) => {
   try {
     await initializeApp();
     
@@ -299,20 +301,36 @@ app.get('/api/init-db', async (req, res) => {
 app.use('/api', apiRoutes);
 
 // Environment info endpoint
-app.get('/api/env-info', (req, res) => {
-  res.json({
-    success: true,
-    data: {
-      nodeEnv: process.env.NODE_ENV || 'unknown',
-      port: process.env.PORT || 'unknown',
+app.get('/api/env-info', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: 'Environment information',
       timestamp: new Date().toISOString(),
-      hasDbHost: !!process.env.DB_HOST,
-      hasDbUser: !!process.env.DB_USER,
-      hasDbPassword: !!process.env.DB_PASSWORD,
-      hasDbName: !!process.env.DB_NAME,
-      databaseInitialized: dbInitialized
-    }
-  });
+      environment: process.env.NODE_ENV || 'unknown',
+      database: {
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT,
+        name: process.env.DB_NAME,
+        user: process.env.DB_USER,
+        hasPassword: !!process.env.DB_PASSWORD
+      },
+      jwt: {
+        hasSecret: !!process.env.JWT_SECRET,
+        expiresIn: process.env.JWT_EXPIRES_IN
+      },
+      app: {
+        port: process.env.PORT,
+        nodeEnv: process.env.NODE_ENV
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error getting environment info',
+      error: error.message
+    });
+  }
 });
 
 // Catch-all for API routes
