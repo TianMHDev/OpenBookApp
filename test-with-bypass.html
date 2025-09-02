@@ -142,6 +142,7 @@
                 <button class="test-btn" onclick="testHealth()">Health Check</button>
                 <button class="test-btn" onclick="testMain()">Main Endpoint</button>
                 <button class="test-btn" onclick="testDatabase()">Database Test</button>
+                <button class="test-btn" onclick="testEnvInfo()">Environment Info</button>
                 <button class="test-btn success" onclick="initDatabase()">Initialize DB</button>
             </div>
             
@@ -254,6 +255,11 @@
         
         async function testDatabase() {
             const result = await makeRequest('/api/test-db');
+            addResult(result);
+        }
+        
+        async function testEnvInfo() {
+            const result = await makeRequest('/api/env-info');
             addResult(result);
         }
         

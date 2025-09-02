@@ -313,7 +313,9 @@ app.get('/api/env-info', async (req, res) => {
         port: process.env.DB_PORT,
         name: process.env.DB_NAME,
         user: process.env.DB_USER,
-        hasPassword: !!process.env.DB_PASSWORD
+        hasPassword: !!process.env.DB_PASSWORD,
+        fullHost: process.env.DB_HOST,
+        fullPort: process.env.DB_PORT
       },
       jwt: {
         hasSecret: !!process.env.JWT_SECRET,
@@ -322,6 +324,13 @@ app.get('/api/env-info', async (req, res) => {
       app: {
         port: process.env.PORT,
         nodeEnv: process.env.NODE_ENV
+      },
+      raw: {
+        DB_HOST: process.env.DB_HOST,
+        DB_PORT: process.env.DB_PORT,
+        DB_NAME: process.env.DB_NAME,
+        DB_USER: process.env.DB_USER,
+        NODE_ENV: process.env.NODE_ENV
       }
     });
   } catch (error) {
