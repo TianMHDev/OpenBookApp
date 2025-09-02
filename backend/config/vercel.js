@@ -5,12 +5,12 @@
 
 // Database configuration for Vercel
 export const dbConfig = {
-  // Support both Railway and custom variable names
-  host: process.env.DB_HOST || process.env.MYSQLHOST || 'crossover.proxy.rlwy.net',
+  // Force use of Railway external URL for production
+  host: process.env.NODE_ENV === 'production' ? 'crossover.proxy.rlwy.net' : (process.env.DB_HOST || process.env.MYSQLHOST || 'localhost'),
   user: process.env.DB_USER || process.env.MYSQLUSER || 'root',
   password: process.env.DB_PASSWORD || process.env.MYSQLPASSWORD || 'LfoGYuVpGdzjmiyfIieZBDZJbbBPgWwf',
   database: process.env.DB_NAME || process.env.MYSQLDATABASE || 'railway',
-  port: parseInt(process.env.DB_PORT || process.env.MYSQLPORT) || 14400,
+  port: process.env.NODE_ENV === 'production' ? 14400 : (parseInt(process.env.DB_PORT || process.env.MYSQLPORT) || 3306),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
