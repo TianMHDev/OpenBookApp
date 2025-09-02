@@ -4,6 +4,9 @@ import cors from 'cors';
 import { pool, initializeDatabase } from '../backend/database/conexion_db.js';
 import { corsConfig, serverConfig } from '../backend/config/vercel.js';
 
+// Import organized routes
+import apiRoutes from '../backend/routes/index.js';
+
 const app = express();
 
 // Basic middleware
@@ -26,6 +29,9 @@ const initializeApp = async () => {
     }
   }
 };
+
+// Mount all API routes under /api
+app.use('/api', apiRoutes);
 
 // Simple health check endpoint
 app.get('/api/health', async (req, res) => {
