@@ -188,30 +188,121 @@ app.get('/api/test-db', async (req, res) => {
           database: dbConfig.database,
           user: dbConfig.user,
           ssl: !!dbConfig.ssl
-        },
-        env: {
-          hasDbHost: !!process.env.DB_HOST,
-          hasDbUser: !!process.env.DB_USER,
-          hasDbPassword: !!process.env.DB_PASSWORD,
-          hasDbName: !!process.env.DB_NAME,
-          hasDbPort: !!process.env.DB_PORT,
-          nodeEnv: process.env.NODE_ENV
         }
       });
     }
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Database test failed',
-      error: error.message,
+      message: 'Test failed',
+      error: error.message
+    });
+  }
+});
+
+// Clever Cloud specific test endpoint
+app.get('/api/test-clever-cloud', async (req, res) => {
+  try {
+    console.log('🔍 Testing Clever Cloud connection...');
+    
+    // Import mysql2 for direct connection
+    const mysql = await import('mysql2/promise');
+    
+    // Clever Cloud configuration
+    const cleverCloudConfig = {
+      host: process.env.CLEVER_CLOUD_HOST || 'b6snjvcp4mfobhjuwuxk-mysql.services.clever-cloud.com',
+      port: parseInt(process.env.CLEVER_CLOUD_PORT) || 3306,
+      user: process.env.CLEVER_CLOUD_USER || 'uv331tr9mhvctrgf',
+      password: process.env.CLEVER_CLOUD_PASSWORD || 'vaZUTPVIjY0xv9Jjqqg3',
+      database: process.env.CLEVER_CLOUD_DATABASE || 'b6snjvcp4mfobhjuwuxk',
+      ssl: { rejectUnauthorized: false }
+    };
+    
+    console.log('📋 Configuration:', {
+      host: cleverCloudConfig.host,
+      port: cleverCloudConfig.port,
+      database: cleverCloudConfig.database,
+      user: cleverCloudConfig.user,
+      ssl: !!cleverCloudConfig.ssl
+    });
+    
+    // Create connection
+    const connection = await mysql.default.createConnection(cleverCloudConfig);
+    console.log('✅ Connection successful!');
+    
+    // Test basic query
+    const [tables] = await connection.execute('SHOW TABLES');
+    console.log(`📋 Found ${tables.length} tables`);
+    
+    // Test data in key tables
+    const keyTables = ['roles', 'institutions', 'users', 'books', 'genres'];
+    const tableData = {};
+    
+    for (const tableName of keyTables) {
+      try {
+        const [count] = await connection.execute(`SELECT COUNT(*) as count FROM ${tableName}`);
+        tableData[tableName] = count[0].count;
+      } catch (error) {
+        tableData[tableName] = 'Error: ' + error.message;
+      }
+    }
+    
+    await connection.end();
+    
+    res.json({
+      success: true,
+      message: 'Clever Cloud connection successful!',
+      timestamp: new Date().toISOString(),
+      data: {
+        tablesFound: tables.length,
+        tableNames: tables.map(t => Object.values(t)[0]),
+        tableData: tableData
+      },
+      config: {
+        host: cleverCloudConfig.host,
+        port: cleverCloudConfig.port,
+        database: cleverCloudConfig.database,
+        user: cleverCloudConfig.user,
+        ssl: !!cleverCloudConfig.ssl
+      },
       env: {
-        hasDbHost: !!process.env.DB_HOST,
-        hasDbUser: !!process.env.DB_USER,
-        hasDbPassword: !!process.env.DB_PASSWORD,
-        hasDbName: !!process.env.DB_NAME,
-        hasDbPort: !!process.env.DB_PORT,
+        hasCleverHost: !!process.env.CLEVER_CLOUD_HOST,
+        hasCleverUser: !!process.env.CLEVER_CLOUD_USER,
+        hasCleverPassword: !!process.env.CLEVER_CLOUD_PASSWORD,
+        hasCleverDatabase: !!process.env.CLEVER_CLOUD_DATABASE,
+        hasCleverPort: !!process.env.CLEVER_CLOUD_PORT,
         nodeEnv: process.env.NODE_ENV
       }
+    });
+    
+  } catch (error) {
+    console.error('❌ Clever Cloud test failed:', error.message);
+    
+    res.status(500).json({
+      success: false,
+      message: 'Clever Cloud connection failed',
+      error: error.message,
+      config: {
+        host: process.env.CLEVER_CLOUD_HOST || 'not set',
+        port: process.env.CLEVER_CLOUD_PORT || 'not set',
+        database: process.env.CLEVER_CLOUD_DATABASE || 'not set',
+        user: process.env.CLEVER_CLOUD_USER || 'not set',
+        password: process.env.CLEVER_CLOUD_PASSWORD ? 'set' : 'not set'
+      },
+      env: {
+        hasCleverHost: !!process.env.CLEVER_CLOUD_HOST,
+        hasCleverUser: !!process.env.CLEVER_CLOUD_USER,
+        hasCleverPassword: !!process.env.CLEVER_CLOUD_PASSWORD,
+        hasCleverDatabase: !!process.env.CLEVER_CLOUD_DATABASE,
+        hasCleverPort: !!process.env.CLEVER_CLOUD_PORT,
+        nodeEnv: process.env.NODE_ENV
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Test failed',
+      error: error.message
     });
   }
 });
